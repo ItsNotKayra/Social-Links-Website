@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Your Bio Links</title>
+  <title>ItsNotKayra</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,38 +23,33 @@
     <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="10" />
   </div>
 
-  <!-- Animated Gradient Background -->
+  <!-- Animated Gradient Background (shown before video loads) -->
   <div class="bg-gradient"></div>
   <div class="bg-flames"></div>
-
-  <!-- Dark Overlay -->
   <div class="bg-overlay"></div>
 
   <!-- Background Video -->
-  <video id="introVideo" class="intro-video" preload="metadata" autoplay muted playsinline>
+  <video id="introVideo" class="intro-video" preload="auto" muted playsinline loop>
     <source src="video.webm" type="video/webm" />
     <source src="video.mp4" type="video/mp4" />
-    Your browser does not support the video tag.
   </video>
 
-  <!-- Splash Screen Intro -->
+  <!-- Splash Screen -->
   <div class="splash-screen" id="splashScreen">
     <div class="splash-content">
       <p class="splash-text">Click to enter</p>
     </div>
   </div>
 
-  <!-- Content -->
-  <div class="container" id="mainContent" style="display: none;">
+  <!-- Main Content -->
+  <div class="container" id="mainContent">
     <!-- Profile Section -->
     <section class="profile-section">
       <div class="avatar-wrapper">
         <div class="avatar" id="avatar-image"></div>
       </div>
-
       <h1 class="profile-name" data-text="ItsNotKayra">ItsNotKayra</h1>
       <p class="profile-bio">Streamer | Gamer | Content Creator</p>
-
       <p class="profile-status">
         <svg class="status-icon" viewBox="0 0 24 24" fill="currentColor">
           <circle cx="12" cy="12" r="8"></circle>
@@ -120,6 +115,6 @@
     </footer>
   </div>
 
-  <script defer src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

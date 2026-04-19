@@ -1,120 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ItsNotKayra</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet" />
+<title>hollowdespair</title>
 
-  <link rel="stylesheet" href="style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #000;
+  --white: #fff;
+}
+
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  overflow: hidden;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* VIDEO */
+video {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+video.visible {
+  opacity: 1;
+}
+
+/* EYE OPEN EFFECT */
+.cinematic-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.eye {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: #000;
+  transition: transform 2s cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+.eye-top {
+  top: 0;
+}
+
+.eye-bottom {
+  bottom: 0;
+}
+
+.cinematic-overlay.open .eye-top {
+  transform: translateY(-100%);
+}
+
+.cinematic-overlay.open .eye-bottom {
+  transform: translateY(100%);
+}
+
+/* TEXT */
+.intro-text {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  color: #fff;
+  opacity: 0;
+  letter-spacing: 4px;
+  text-align: center;
+  z-index: 20;
+
+  text-shadow:
+    0 0 5px #fff,
+    0 0 10px #fff,
+    0 0 20px #fff,
+    0 0 40px #fff,
+    0 0 80px #fff;
+
+  transition: opacity 1.5s ease;
+}
+
+.intro-text.show {
+  opacity: 1;
+}
+
+/* subtle flicker */
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 0.8; }
+  50% { opacity: 0.4; }
+  55% { opacity: 0.9; }
+}
+
+.intro-text.show {
+  animation: flicker 3s infinite;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  .intro-text {
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+  }
+}
+</style>
 </head>
 
 <body>
-  <!-- Volume Control -->
-  <div class="volume-control" id="volumeControl">
-    <svg class="volume-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-      <path d="M15.54 8.46a7 7 0 0 1 0 9.9"></path>
-      <path d="M17.11 11.05a3 3 0 0 1 0 4.24"></path>
-    </svg>
-    <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="10" />
-  </div>
 
-  <!-- Animated Gradient Background (shown before video loads) -->
-  <div class="bg-gradient"></div>
-  <div class="bg-flames"></div>
-  <div class="bg-overlay"></div>
+<!-- VIDEO -->
+<video id="video" preload="auto" playsinline>
+  <source src="video.mp4" type="video/mp4">
+  <source src="video.webm" type="video/webm">
+</video>
 
-  <!-- Background Video -->
-  <video id="introVideo" class="intro-video" preload="auto" muted playsinline loop>
-    <source src="video.webm" type="video/webm" />
-    <source src="video.mp4" type="video/mp4" />
-  </video>
+<!-- EYE OVERLAY -->
+<div class="cinematic-overlay" id="overlay">
+  <div class="eye eye-top"></div>
+  <div class="eye eye-bottom"></div>
+</div>
 
-  <!-- Splash Screen -->
-  <div class="splash-screen" id="splashScreen">
-    <div class="splash-content">
-      <p class="splash-text">CLICK TO ENTER</p>
-    </div>
-  </div>
+<!-- TEXT -->
+<div class="intro-text" id="text">
+  @hollowdespair | .gg/shootem
+</div>
 
-  <!-- Main Content -->
-  <div class="container" id="mainContent">
-    <!-- Profile Section -->
-    <section class="profile-section">
-      <div class="avatar-wrapper">
-        <div class="avatar" id="avatar-image"></div>
-      </div>
-      <h1 class="profile-name" data-text="ItsNotKayra">ItsNotKayra</h1>
-      <p class="profile-bio">Freelance Developer | Content Creator</p>
-      <p class="profile-status">
-        <svg class="status-icon" viewBox="0 0 24 24" fill="currentColor">
-          <circle cx="12" cy="12" r="8"></circle>
-        </svg>
-        Check out my socials below.
-      </p>
-    </section>
+<script>
+const video = document.getElementById('video');
+const overlay = document.getElementById('overlay');
+const text = document.getElementById('text');
 
-    <!-- Links Section -->
-    <section class="links-section">
-      <div class="link-card" data-link="https://www.youtube.com/@ItsNotKayra">
-        <img class="link-icon" src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/youtube-app-white-icon.png" alt="YouTube">
-        <div class="link-content">
-          <h3>YouTube</h3>
-          <p>Subscribe to my channel</p>
-        </div>
-        <svg class="link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14M12 5l7 7-7 7"></path>
-        </svg>
-      </div>
+// Start muted (required by browsers)
+video.muted = true;
+video.volume = 0;
 
-      <div class="link-card" data-link="https://www.tiktok.com/@itsnot.kayra">
-        <img class="link-icon" src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/tiktok-simplified-white-icon.png" alt="TikTok">
-        <div class="link-content">
-          <h3>TikTok</h3>
-          <p>Follow me on TikTok</p>
-        </div>
-        <svg class="link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14M12 5l7 7-7 7"></path>
-        </svg>
-      </div>
+// Wait until video is fully loaded
+video.addEventListener('canplaythrough', async () => {
+  try {
+    await video.play();
+  } catch (e) {}
 
-      <div class="link-card" data-link="https://discord.gg/9tNWxHT5GJ">
-        <img class="link-icon" src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/discord-white-icon.png" alt="Discord">
-        <div class="link-content">
-          <h3>Discord</h3>
-          <p>Join the community</p>
-        </div>
-        <svg class="link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14M12 5l7 7-7 7"></path>
-        </svg>
-      </div>
+  // Fade in video
+  video.classList.add('visible');
 
-      <div class="link-card" data-link="https://www.roblox.com/users/659540539/profile">
-        <img class="link-icon" src="https://cdn2.steamgriddb.com/icon_thumb/b7f5d38aaa4e8a553f49c085ee06bb15.png" alt="Roblox">
-        <div class="link-content">
-          <h3>Roblox</h3>
-          <p>Check out my profile</p>
-        </div>
-        <svg class="link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14M12 5l7 7-7 7"></path>
-        </svg>
-      </div>
-    </section>
+  // Open eyes
+  setTimeout(() => {
+    overlay.classList.add('open');
+  }, 300);
 
-    <footer class="footer">
-      <p>
-        Created by ItsNotKayra
-        <svg class="footer-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-        </svg>
-      </p>
-    </footer>
-  </div>
+  // Show text
+  setTimeout(() => {
+    text.classList.add('show');
+  }, 1200);
 
-  <script src="script.js"></script>
+  // Fade in sound smoothly
+  setTimeout(() => {
+    video.muted = false;
+
+    let vol = 0;
+    const fade = setInterval(() => {
+      vol += 0.02;
+      video.volume = Math.min(vol, 1);
+
+      if (vol >= 1) clearInterval(fade);
+    }, 100);
+  }, 1500);
+});
+
+// Start loading immediately
+video.load();
+</script>
+
 </body>
 </html>

@@ -17,47 +17,32 @@ html, body {
 }
 
 /* ══════════════════════════════
-   CUSTOM NEON CURSOR
+   CUSTOM DOT CURSOR (no ring)
 ══════════════════════════════ */
 #cursor-dot {
   position: fixed;
-  width: 8px; height: 8px;
+  width: 7px; height: 7px;
   background: #fff;
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 6px #fff, 0 0 12px #fff, 0 0 24px rgba(255,255,255,0.6);
-  transition: width 0.15s, height 0.15s;
+  box-shadow: 0 0 6px #fff, 0 0 14px rgba(255,255,255,0.5);
+  transition: width 0.12s, height 0.12s;
 }
-#cursor-ring {
-  position: fixed;
-  width: 36px; height: 36px;
-  border: 1px solid rgba(255,255,255,0.5);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 8px rgba(255,255,255,0.2), inset 0 0 8px rgba(255,255,255,0.05);
-  transition: width 0.2s, height 0.2s, border-color 0.2s;
-}
+body.cursor-hover #cursor-dot { width: 5px; height: 5px; }
+
 .trail-particle {
   position: fixed;
   border-radius: 50%;
   pointer-events: none;
   transform: translate(-50%, -50%);
-  animation: trail-fade 0.5s ease forwards;
+  animation: trail-fade 0.45s ease forwards;
 }
 @keyframes trail-fade {
-  from { opacity: 0.6; width: 6px; height: 6px; }
-  to   { opacity: 0; width: 2px; height: 2px; }
+  from { opacity: 0.5; }
+  to   { opacity: 0; width: 2px !important; height: 2px !important; }
 }
-body.cursor-hover #cursor-ring {
-  width: 54px; height: 54px;
-  border-color: rgba(255,255,255,0.9);
-  box-shadow: 0 0 20px rgba(255,255,255,0.4), inset 0 0 12px rgba(255,255,255,0.1);
-}
-body.cursor-hover #cursor-dot { width: 4px; height: 4px; }
 
 /* ══════════════════════════════
    CLICK TO ENTER
@@ -66,18 +51,17 @@ body.cursor-hover #cursor-dot { width: 4px; height: 4px; }
   position: fixed; inset: 0; z-index: 100;
   background: #000;
   display: flex; align-items: center; justify-content: center; flex-direction: column;
-  gap: 24px;
-  transition: opacity 1s ease;
+  gap: 20px; transition: opacity 1s ease;
 }
 #enter-screen.fade-out { opacity: 0; pointer-events: none; }
 .enter-label {
-  font-size: clamp(0.7rem, 1.5vw, 1rem);
+  font-size: clamp(0.65rem, 1.4vw, 0.95rem);
   letter-spacing: 8px; color: #fff; text-transform: uppercase;
   opacity: 0; animation: pulse-in 1.5s ease forwards 0.5s;
   text-shadow: 0 0 5px #fff, 0 0 15px #fff, 0 0 30px #fff;
 }
 .enter-hint {
-  font-size: clamp(0.45rem, 0.9vw, 0.6rem);
+  font-size: clamp(0.4rem, 0.85vw, 0.58rem);
   letter-spacing: 4px; color: rgba(255,255,255,0.3);
   opacity: 0; animation: pulse-in 1.5s ease forwards 1.2s;
 }
@@ -91,8 +75,7 @@ body.cursor-hover #cursor-dot { width: 4px; height: 4px; }
 ══════════════════════════════ */
 video {
   position: fixed; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; opacity: 0;
-  transition: opacity 1.5s ease; z-index: 0;
+  object-fit: cover; opacity: 0; transition: opacity 1.5s ease; z-index: 0;
 }
 video.visible { opacity: 1; }
 .fallback-bg {
@@ -103,7 +86,7 @@ video.visible { opacity: 1; }
 }
 
 /* ══════════════════════════════
-   ATMOSPHERIC LAYERS
+   ATMOSPHERIC
 ══════════════════════════════ */
 .scanlines {
   position: fixed; inset: 0; z-index: 5; pointer-events: none;
@@ -125,10 +108,9 @@ video.visible { opacity: 1; }
 .eye {
   position: absolute; left: 0; width: 100%; height: 50%;
   background: #000;
-  transition: transform 2s cubic-bezier(0.7, 0, 0.2, 1);
-  will-change: transform;
+  transition: transform 2s cubic-bezier(0.7, 0, 0.2, 1); will-change: transform;
 }
-.eye-top    { top: 0; }
+.eye-top { top: 0; }
 .eye-bottom { bottom: 0; }
 .cinematic-overlay.open .eye-top    { transform: translateY(-100%); }
 .cinematic-overlay.open .eye-bottom { transform: translateY(100%); }
@@ -137,187 +119,339 @@ video.visible { opacity: 1; }
    VOLUME SLIDER
 ══════════════════════════════ */
 #volume-control {
-  position: fixed; top: 28px; left: 28px; z-index: 50;
-  display: flex; align-items: center; gap: 12px;
+  position: fixed; top: 24px; left: 24px; z-index: 50;
+  display: flex; align-items: center; gap: 10px;
   opacity: 0; transform: translateX(-10px);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
 #volume-control.visible { opacity: 1; transform: translateX(0); }
-.vol-icon { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.85; }
+.vol-icon { width: 16px; height: 16px; flex-shrink: 0; }
 #volume-slider {
   -webkit-appearance: none; appearance: none;
-  width: 110px; height: 3px; border-radius: 2px; outline: none;
-  background: linear-gradient(to right, #fff 0%, #fff var(--val, 100%), rgba(255,255,255,0.15) var(--val, 100%), rgba(255,255,255,0.15) 100%);
-  box-shadow: 0 0 6px rgba(255,255,255,0.4), 0 0 12px rgba(255,255,255,0.15);
-  cursor: none;
+  width: 90px; height: 2px; border-radius: 2px; outline: none; cursor: none;
+  background: linear-gradient(to right, #fff 0%, #fff var(--val,100%), rgba(255,255,255,0.15) var(--val,100%), rgba(255,255,255,0.15) 100%);
+  box-shadow: 0 0 6px rgba(255,255,255,0.3);
 }
 #volume-slider::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%;
+  -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%;
   background: #fff; cursor: none;
-  box-shadow: 0 0 4px #fff, 0 0 10px #fff, 0 0 20px rgba(255,255,255,0.7);
-  transition: transform 0.15s;
+  box-shadow: 0 0 4px #fff, 0 0 10px rgba(255,255,255,0.6);
 }
-#volume-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
 #volume-slider::-moz-range-thumb {
-  width: 12px; height: 12px; border: none; border-radius: 50%;
+  width: 10px; height: 10px; border: none; border-radius: 50%;
   background: #fff; cursor: none;
-  box-shadow: 0 0 4px #fff, 0 0 10px #fff, 0 0 20px rgba(255,255,255,0.7);
+  box-shadow: 0 0 4px #fff, 0 0 10px rgba(255,255,255,0.6);
 }
 
 /* ══════════════════════════════
-   CENTER TEXT
+   CENTER CONTENT WRAPPER
 ══════════════════════════════ */
-.intro-text {
+#center-content {
   position: fixed; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  display: flex; flex-direction: column; align-items: center; gap: 28px;
-  z-index: 20; opacity: 0; transition: opacity 1.5s ease;
-  user-select: none;
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
+  z-index: 20;
+  opacity: 0; transition: opacity 1.5s ease;
+  width: min(90vw, 560px);
 }
-.intro-text.show { opacity: 1; }
+#center-content.show { opacity: 1; }
+
+/* ══════════════════════════════
+   MAIN TEXT
+══════════════════════════════ */
 .intro-label {
-  font-size: clamp(0.9rem, 2.5vw, 2rem);
+  font-size: clamp(0.8rem, 2vw, 1.6rem);
   letter-spacing: 4px; text-align: center; white-space: nowrap;
   mix-blend-mode: difference; color: #fff; opacity: 0.9;
-  pointer-events: none;
+  pointer-events: none; user-select: none;
+  animation: none;
 }
-.intro-text.show .intro-label { animation: flicker 3s infinite; }
+#center-content.show .intro-label { animation: flicker 3s infinite; }
 @keyframes flicker {
   0%, 100% { opacity: 0.9; }
-  45%       { opacity: 0.75; }
-  50%       { opacity: 0.3; }
-  55%       { opacity: 0.88; }
+  45% { opacity: 0.75; }
+  50% { opacity: 0.28; }
+  55% { opacity: 0.88; }
 }
 
 /* ══════════════════════════════
-   JOIN US BUTTON
+   PROFILE CARD  (guns.lol style)
+══════════════════════════════ */
+.profile-card {
+  width: 100%;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 16px 18px;
+  display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.6), 0 0 1px rgba(255,255,255,0.08);
+}
+
+/* top row: pfp + name/desc + badges */
+.profile-top {
+  display: flex; align-items: flex-start; gap: 14px;
+}
+
+/* profile picture */
+.pfp-wrap {
+  flex-shrink: 0; position: relative;
+  width: 58px; height: 58px;
+}
+.pfp-wrap img {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 0 12px rgba(255,255,255,0.1);
+  display: block;
+}
+/* status dot */
+.pfp-wrap .status-dot {
+  position: absolute; bottom: 2px; right: 2px;
+  width: 11px; height: 11px; border-radius: 50%;
+  background: #23a559;
+  border: 2px solid rgba(0,0,0,0.8);
+  box-shadow: 0 0 6px rgba(35,165,89,0.7);
+}
+
+/* name + description column */
+.profile-info {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 4px;
+  padding-top: 2px;
+}
+.profile-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.85rem, 1.8vw, 1.1rem);
+  font-weight: 700; letter-spacing: 2px;
+  color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.profile-desc {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.42rem, 0.9vw, 0.55rem);
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.45);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ── BADGES ── */
+/* ════════════════════════════════════════
+   HOW TO EDIT BADGES — see README.txt
+   Each .badge element = one badge icon
+════════════════════════════════════════ */
+.badges {
+  display: flex; flex-wrap: wrap;
+  gap: 5px; align-items: center;
+  padding-top: 4px;
+  flex-shrink: 0;
+  max-width: 180px;
+  justify-content: flex-end;
+}
+.badge {
+  position: relative;
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: none;
+}
+.badge img,
+.badge svg {
+  width: 22px; height: 22px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 3px rgba(255,255,255,0.3));
+  transition: transform 0.2s, filter 0.2s;
+}
+.badge:hover img,
+.badge:hover svg {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.7));
+}
+/* tooltip on hover */
+.badge::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.85);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.85);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.42rem; letter-spacing: 2px; text-transform: uppercase;
+  white-space: nowrap;
+  padding: 4px 8px;
+  pointer-events: none;
+  opacity: 0; transition: opacity 0.2s;
+  backdrop-filter: blur(8px);
+  z-index: 300;
+}
+.badge:hover::after { opacity: 1; }
+
+/* ── DIVIDER ── */
+.card-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+}
+
+/* ── DISCORD ROWS (user + server) ── */
+.discord-rows {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.discord-row {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 8px 12px;
+  transition: border-color 0.25s, background 0.25s;
+  cursor: none;
+}
+.discord-row:hover {
+  border-color: rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+}
+
+.discord-row-avatar {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.discord-row-info { flex: 1; min-width: 0; }
+.discord-row-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.55rem, 1.1vw, 0.72rem);
+  letter-spacing: 2px; color: #fff; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.discord-row-sub {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.38rem, 0.75vw, 0.48rem);
+  letter-spacing: 2px; color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+}
+.discord-online-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #23a559;
+  box-shadow: 0 0 6px rgba(35,165,89,0.8);
+  flex-shrink: 0;
+}
+
+/* server join button inside row */
+.server-join-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.42rem; letter-spacing: 3px; text-transform: uppercase;
+  color: #fff; text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.25);
+  padding: 5px 12px;
+  background: transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: none; white-space: nowrap; flex-shrink: 0;
+  display: flex; align-items: center; gap: 6px;
+}
+.server-join-btn:hover {
+  border-color: rgba(255,255,255,0.7);
+  box-shadow: 0 0 10px rgba(255,255,255,0.15);
+}
+.server-join-btn svg { width: 10px; height: 10px; fill: currentColor; }
+
+/* ══════════════════════════════
+   JOIN US BUTTON + DISCORD POPUP
 ══════════════════════════════ */
 .join-btn-wrap {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+/* WIDGET — below the button */
+#discord-widget-popup {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  width: 290px;
+  background: rgba(0,0,0,0.88);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 0 30px rgba(255,255,255,0.06), 0 20px 50px rgba(0,0,0,0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  z-index: 200;
+}
+/* arrow pointing UP to button */
+#discord-widget-popup::before {
+  content: '';
+  position: absolute;
+  top: -6px; left: 50%;
+  transform: translateX(-50%);
+  width: 10px; height: 6px;
+  background: rgba(255,255,255,0.12);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+#discord-widget-popup.visible {
+  opacity: 1; pointer-events: all;
+  transform: translateX(-50%) translateY(0);
+}
+.widget-header {
+  padding: 9px 12px 7px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  display: flex; align-items: center; gap: 7px;
+}
+.widget-header svg { width: 13px; height: 13px; fill: rgba(255,255,255,0.6); }
+.widget-header span {
+  font-size: 0.48rem; letter-spacing: 4px; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+#discord-widget-popup iframe {
+  display: block; width: 100%; height: 360px; border: none; background: transparent;
 }
 
 .join-btn {
   pointer-events: all;
-  display: inline-flex; align-items: center; gap: 10px;
-  padding: 9px 28px;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 24px;
   font-family: 'Orbitron', sans-serif;
-  font-size: clamp(0.5rem, 1vw, 0.65rem);
+  font-size: clamp(0.45rem, 0.9vw, 0.58rem);
   letter-spacing: 5px; text-transform: uppercase;
   text-decoration: none; color: #fff;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.35);
   position: relative; overflow: hidden;
   transition: border-color 0.3s, box-shadow 0.3s;
-  mix-blend-mode: difference;
-  cursor: none;
+  mix-blend-mode: difference; cursor: none;
 }
 .join-btn::before {
   content: ''; position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
-  transform: translateX(-100%); transition: transform 0.5s ease;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+  transform: translateX(-100%); transition: transform 0.45s ease;
 }
 .join-btn:hover::before { transform: translateX(100%); }
-.join-btn:hover {
-  border-color: rgba(255,255,255,0.95);
-  box-shadow: 0 0 8px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.15), inset 0 0 8px rgba(255,255,255,0.05);
-}
-.join-btn svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
-.join-btn .corner {
-  position: absolute; width: 5px; height: 5px;
-  border-color: #fff; border-style: solid; opacity: 0.7;
-}
-.join-btn .corner.tl { top: -1px; left: -1px;   border-width: 1px 0 0 1px; }
-.join-btn .corner.tr { top: -1px; right: -1px;  border-width: 1px 1px 0 0; }
-.join-btn .corner.bl { bottom: -1px; left: -1px; border-width: 0 0 1px 1px; }
-.join-btn .corner.br { bottom: -1px; right: -1px;border-width: 0 1px 1px 0; }
-
-/* ══════════════════════════════
-   DISCORD WIDGET POPUP
-══════════════════════════════ */
-#discord-widget-popup {
-  position: absolute;
-  bottom: calc(100% + 14px);
-  left: 50%;
-  transform: translateX(-50%) translateY(8px);
-  width: 320px;
-  background: rgba(0, 0, 0, 0.85);
-  border: 1px solid rgba(255,255,255,0.15);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.05),
-    0 0 30px rgba(255,255,255,0.08),
-    0 0 60px rgba(255,255,255,0.04),
-    0 20px 60px rgba(0,0,0,0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  z-index: 200;
-  mix-blend-mode: normal;
-}
-/* small arrow pointing down to button */
-#discord-widget-popup::after {
-  content: '';
-  position: absolute;
-  bottom: -6px; left: 50%;
-  transform: translateX(-50%);
-  width: 10px; height: 6px;
-  background: rgba(255,255,255,0.15);
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
-}
-
-#discord-widget-popup.visible {
-  opacity: 1;
-  pointer-events: all;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* top bar of widget popup */
-.widget-header {
-  padding: 10px 14px 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  display: flex; align-items: center; gap: 8px;
-}
-.widget-header svg { width: 16px; height: 16px; fill: rgba(255,255,255,0.7); flex-shrink: 0; }
-.widget-header span {
-  font-size: 0.55rem; letter-spacing: 4px; text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
-}
-
-#discord-widget-popup iframe {
-  display: block;
-  width: 100%;
-  height: 420px;
-  border: none;
-  background: transparent;
-}
+.join-btn:hover { border-color: rgba(255,255,255,0.9); box-shadow: 0 0 16px rgba(255,255,255,0.12); }
+.join-btn svg { width: 11px; height: 11px; fill: currentColor; flex-shrink: 0; }
+.corner { position: absolute; width: 4px; height: 4px; border-color: #fff; border-style: solid; opacity: 0.6; }
+.corner.tl { top:-1px; left:-1px; border-width:1px 0 0 1px; }
+.corner.tr { top:-1px; right:-1px; border-width:1px 1px 0 0; }
+.corner.bl { bottom:-1px; left:-1px; border-width:0 0 1px 1px; }
+.corner.br { bottom:-1px; right:-1px; border-width:0 1px 1px 0; }
 </style>
 </head>
 <body>
 
-<!-- CUSTOM CURSOR -->
+<!-- CURSOR -->
 <div id="cursor-dot"></div>
-<div id="cursor-ring"></div>
 
-<!-- CLICK TO ENTER -->
+<!-- ENTER SCREEN -->
 <div id="enter-screen">
   <div class="enter-label">click to enter</div>
   <div class="enter-hint">[ tap anywhere ]</div>
 </div>
 
 <div class="fallback-bg"></div>
-
 <video id="video" preload="auto" playsinline muted loop>
-  <source src="video.mp4" type="video/mp4">
+  <source src="Video.mp4" type="video/mp4">
 </video>
-
 <div class="scanlines" id="scanlines"></div>
 <div class="vignette"  id="vignette"></div>
-
 <div class="cinematic-overlay" id="overlay">
   <div class="eye eye-top"></div>
   <div class="eye eye-bottom"></div>
@@ -325,54 +459,163 @@ video.visible { opacity: 1; }
 
 <!-- VOLUME -->
 <div id="volume-control">
-  <svg class="vol-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M11 5L6 9H2v6h4l5 4V5z" fill="white" opacity="0.85"/>
-    <path id="vol-wave1" d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.85"/>
-    <path id="vol-wave2" d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/>
+  <svg class="vol-icon" viewBox="0 0 24 24" fill="none">
+    <path d="M11 5L6 9H2v6h4l5 4V5z" fill="white" opacity="0.8"/>
+    <path id="vol-wave1" d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.8"/>
+    <path id="vol-wave2" d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.45"/>
   </svg>
   <input type="range" id="volume-slider" min="0" max="100" value="100">
 </div>
 
-<!-- CENTER TEXT + BUTTON -->
-<div class="intro-text" id="text">
+<!-- CENTER CONTENT -->
+<div id="center-content">
+
+  <!-- MAIN TAG LINE -->
   <span class="intro-label">@hollowdespair | .gg/shootem</span>
 
-  <div class="join-btn-wrap" id="join-wrap">
-    <!-- DISCORD WIDGET POPUP -->
-    <div id="discord-widget-popup">
-      <div class="widget-header">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-        </svg>
-        <span>hollowdespair</span>
-      </div>
-      <iframe
-        src="https://discord.com/widget?id=1494733304899960922&theme=dark"
-        allowtransparency="true"
-        frameborder="0"
-        sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
-      </iframe>
-    </div>
+  <!-- ════════════════════════════════════
+       PROFILE CARD
+       To edit: see README.txt
+  ════════════════════════════════════ -->
+  <div class="profile-card">
 
-    <a class="join-btn" id="join-btn" href="https://discord.gg/shootem" target="_blank" rel="noopener">
-      <span class="corner tl"></span>
-      <span class="corner tr"></span>
-      <span class="corner bl"></span>
-      <span class="corner br"></span>
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-      </svg>
-      join us
-    </a>
-  </div>
-</div>
+    <!-- TOP ROW -->
+    <div class="profile-top">
+
+      <!-- PFP: change src to any image URL -->
+      <div class="pfp-wrap">
+        <img id="pfp-img"
+          src="https://cdn.discordapp.com/avatars/1494733304899960922/placeholder.png"
+          onerror="this.src='https://ui-avatars.com/api/?name=HD&background=111&color=fff&size=128&bold=true&font-size=0.45'"
+          alt="pfp">
+        <div class="status-dot"></div>
+      </div>
+
+      <!-- NAME + DESCRIPTION -->
+      <div class="profile-info">
+        <!-- ✏️ Change display name below -->
+        <div class="profile-name">hollowdespair</div>
+        <!-- ✏️ Change status/description below -->
+        <div class="profile-desc">currently doing nothing</div>
+      </div>
+
+      <!-- BADGES
+           ✏️ To add/duplicate: copy a <div class="badge"> block
+           ✏️ To change icon: replace the emoji or swap <img src="...">
+           ✏️ To change tooltip: edit data-tip="..."
+           Full instructions in README.txt
+      -->
+      <div class="badges">
+
+        <!-- BADGE 1: Diamond / Nitro -->
+        <div class="badge" data-tip="Nitro">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L15.5 8.5H20.5L16.5 13L18 20L12 16.5L6 20L7.5 13L3.5 8.5H8.5L12 2Z" fill="rgba(255,255,255,0.85)" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+          </svg>
+        </div>
+
+        <!-- BADGE 2: Star / Server Boost -->
+        <div class="badge" data-tip="Server Boost">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z" fill="rgba(255,255,255,0.8)" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+          </svg>
+        </div>
+
+        <!-- BADGE 3: Shield / Mod -->
+        <div class="badge" data-tip="Moderator">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6L12 2z" fill="rgba(255,255,255,0.8)" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+          </svg>
+        </div>
+
+        <!-- BADGE 4: Globe / Active Dev -->
+        <div class="badge" data-tip="Active Developer">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/>
+            <path d="M12 3c-2.5 3-4 5.8-4 9s1.5 6 4 9M12 3c2.5 3 4 5.8 4 9s-1.5 6-4 9M3 12h18" stroke="rgba(255,255,255,0.8)" stroke-width="1.2"/>
+          </svg>
+        </div>
+
+        <!-- BADGE 5: Pen / Early Supporter -->
+        <div class="badge" data-tip="Early Supporter">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" fill="rgba(255,255,255,0.8)" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+          </svg>
+        </div>
+
+        <!-- BADGE 6: custom gun icon matching theme -->
+        <div class="badge" data-tip="shootem">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M2 14h2v2H2v-2zm2-4h12v4H4v-4zm12 0h2l3-3v4l-3 2h-2v-3z" fill="rgba(255,255,255,0.75)" stroke="rgba(255,255,255,0.2)" stroke-width="0.4"/>
+          </svg>
+        </div>
+
+      </div><!-- /badges -->
+    </div><!-- /profile-top -->
+
+    <div class="card-divider"></div>
+
+    <!-- DISCORD ROWS -->
+    <div class="discord-rows">
+
+      <!-- YOUR DISCORD USER ROW -->
+      <div class="discord-row">
+        <img class="discord-row-avatar"
+          src="https://ui-avatars.com/api/?name=HD&background=111&color=fff&size=64&bold=true&font-size=0.45"
+          alt="user avatar">
+        <div class="discord-row-info">
+          <!-- ✏️ Change your Discord username below -->
+          <div class="discord-row-name">hollowdespair</div>
+          <!-- ✏️ Change your activity/status below -->
+          <div class="discord-row-sub">currently doing nothing</div>
+        </div>
+        <div class="discord-online-dot"></div>
+      </div>
+
+      <!-- YOUR DISCORD SERVER ROW -->
+      <div class="discord-row">
+        <img class="discord-row-avatar"
+          src="https://ui-avatars.com/api/?name=S&background=222&color=fff&size=64&bold=true"
+          alt="server icon">
+        <div class="discord-row-info">
+          <!-- ✏️ Change server name below -->
+          <div class="discord-row-name">/shootem</div>
+          <!-- ✏️ Change member count / description below -->
+          <div class="discord-row-sub">2 Online &nbsp;·&nbsp; 7 Members</div>
+        </div>
+        <!-- Join button with Discord widget on hover -->
+        <div class="join-btn-wrap" id="join-wrap">
+          <div id="discord-widget-popup">
+            <div class="widget-header">
+              <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+              <span>/shootem</span>
+            </div>
+            <iframe src="https://discord.com/widget?id=1494733304899960922&theme=dark"
+              allowtransparency="true" frameborder="0"
+              sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
+            </iframe>
+          </div>
+
+          <a class="join-btn" href="https://discord.gg/shootem" target="_blank" rel="noopener">
+            <span class="corner tl"></span><span class="corner tr"></span>
+            <span class="corner bl"></span><span class="corner br"></span>
+            <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+            join us
+          </a>
+        </div>
+      </div>
+
+    </div><!-- /discord-rows -->
+  </div><!-- /profile-card -->
+
+</div><!-- /center-content -->
 
 <script>
 (function () {
   const enterScreen  = document.getElementById('enter-screen');
   const video        = document.getElementById('video');
   const overlay      = document.getElementById('overlay');
-  const text         = document.getElementById('text');
+  const content      = document.getElementById('center-content');
   const scanlines    = document.getElementById('scanlines');
   const vignette     = document.getElementById('vignette');
   const volControl   = document.getElementById('volume-control');
@@ -380,105 +623,79 @@ video.visible { opacity: 1; }
   const volWave1     = document.getElementById('vol-wave1');
   const volWave2     = document.getElementById('vol-wave2');
   const cursorDot    = document.getElementById('cursor-dot');
-  const cursorRing   = document.getElementById('cursor-ring');
   const joinWrap     = document.getElementById('join-wrap');
   const discordPopup = document.getElementById('discord-widget-popup');
 
-  /* ── CURSOR ── */
-  let mx = -100, my = -100, rx = -100, ry = -100;
-
+  /* ── CURSOR (dot only) ── */
+  let mx = -100, my = -100;
   document.addEventListener('mousemove', e => {
     mx = e.clientX; my = e.clientY;
     cursorDot.style.left = mx + 'px';
     cursorDot.style.top  = my + 'px';
-
     const p = document.createElement('div');
     p.className = 'trail-particle';
-    p.style.left = mx + 'px';
-    p.style.top  = my + 'px';
-    const size = Math.random() * 4 + 2;
-    p.style.width  = size + 'px';
-    p.style.height = size + 'px';
-    p.style.background = `rgba(255,255,255,${Math.random() * 0.4 + 0.1})`;
-    p.style.boxShadow = '0 0 4px #fff, 0 0 8px rgba(255,255,255,0.5)';
+    p.style.left = mx + 'px'; p.style.top = my + 'px';
+    const s = Math.random() * 3 + 2;
+    p.style.width = s + 'px'; p.style.height = s + 'px';
+    p.style.background = `rgba(255,255,255,${Math.random()*0.35+0.08})`;
+    p.style.boxShadow = '0 0 4px rgba(255,255,255,0.4)';
     document.body.appendChild(p);
-    setTimeout(() => p.remove(), 500);
+    setTimeout(() => p.remove(), 450);
   });
 
-  (function animateRing() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    cursorRing.style.left = rx + 'px';
-    cursorRing.style.top  = ry + 'px';
-    requestAnimationFrame(animateRing);
-  })();
-
-  document.querySelectorAll('a, input, button, #enter-screen').forEach(el => {
+  document.querySelectorAll('a, input, .discord-row, .badge').forEach(el => {
     el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
   });
 
-  /* ── DISCORD WIDGET HOVER ── */
+  /* ── LOAD PFP FROM DISCORD WIDGET API ── */
+  fetch('https://discord.com/api/guilds/1494733304899960922/widget.json')
+    .then(r => r.json())
+    .then(data => {
+      // update member count
+      const sub = document.querySelector('.discord-rows .discord-row:last-child .discord-row-sub');
+      if (sub && data.presence_count !== undefined) {
+        sub.textContent = data.presence_count + ' Online · ' + (data.members ? data.members.length : '7') + ' Members';
+      }
+    }).catch(() => {});
+
+  /* ── DISCORD WIDGET POPUP (hover on join wrap) ── */
   let hideTimeout;
-
-  joinWrap.addEventListener('mouseenter', () => {
-    clearTimeout(hideTimeout);
-    discordPopup.classList.add('visible');
-  });
-
-  joinWrap.addEventListener('mouseleave', () => {
-    // small delay so moving into the iframe doesn't flicker
-    hideTimeout = setTimeout(() => {
-      discordPopup.classList.remove('visible');
-    }, 200);
-  });
-
+  joinWrap.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); discordPopup.classList.add('visible'); });
+  joinWrap.addEventListener('mouseleave', () => { hideTimeout = setTimeout(() => discordPopup.classList.remove('visible'), 180); });
   discordPopup.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
-  discordPopup.addEventListener('mouseleave', () => {
-    hideTimeout = setTimeout(() => {
-      discordPopup.classList.remove('visible');
-    }, 200);
-  });
+  discordPopup.addEventListener('mouseleave', () => { hideTimeout = setTimeout(() => discordPopup.classList.remove('visible'), 180); });
 
   /* ── VOLUME ── */
-  function updateSliderTrack(val) {
+  function updateTrack(val) {
     volSlider.style.setProperty('--val', val + '%');
-    volWave1.style.opacity = val == 0 ? '0' : '0.85';
-    volWave2.style.opacity = val < 50 ? '0' : '0.5';
+    volWave1.style.opacity = val == 0 ? '0' : '0.8';
+    volWave2.style.opacity = val < 50 ? '0' : '0.45';
   }
-
   volSlider.addEventListener('input', () => {
-    const val = parseInt(volSlider.value);
-    video.volume = val / 100;
-    video.muted  = val === 0;
-    updateSliderTrack(val);
+    const v = parseInt(volSlider.value);
+    video.volume = v / 100; video.muted = v === 0;
+    updateTrack(v);
   });
 
-  /* ── ENTER SEQUENCE ── */
+  /* ── ENTER ── */
   video.load();
-
   enterScreen.addEventListener('click', async () => {
     enterScreen.classList.add('fade-out');
     setTimeout(() => enterScreen.remove(), 1000);
-
-    video.muted  = false;
-    video.volume = 0;
-
+    video.muted = false; video.volume = 0;
     try { await video.play(); }
-    catch (e) { video.muted = true; await video.play().catch(() => {}); }
-
+    catch(e) { video.muted = true; await video.play().catch(()=>{}); }
     video.classList.add('visible');
-
     setTimeout(() => { scanlines.classList.add('visible'); vignette.classList.add('visible'); }, 400);
     setTimeout(() => overlay.classList.add('open'), 300);
-    setTimeout(() => text.classList.add('show'), 1200);
+    setTimeout(() => content.classList.add('show'), 1200);
     setTimeout(() => volControl.classList.add('visible'), 1600);
-
     setTimeout(() => {
       if (!video.muted) {
         const fade = setInterval(() => {
           video.volume = Math.min(video.volume + 0.02, 1);
-          updateSliderTrack(Math.round(video.volume * 100));
+          updateTrack(Math.round(video.volume * 100));
           volSlider.value = Math.round(video.volume * 100);
           if (video.volume >= 1) clearInterval(fade);
         }, 80);

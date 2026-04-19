@@ -6,42 +6,71 @@
 <title>hollowdespair</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #000;
-  --white: #fff;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   background: #000;
   overflow: hidden;
   font-family: 'Orbitron', sans-serif;
   cursor: none;
 }
 
+/* ── CLICK TO ENTER SCREEN ── */
+#enter-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 24px;
+  transition: opacity 1s ease;
+  cursor: pointer;
+}
+#enter-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+#enter-screen .enter-label {
+  font-size: clamp(0.7rem, 1.5vw, 1rem);
+  letter-spacing: 6px;
+  color: #fff;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: pulse-in 1.5s ease forwards 0.5s;
+  text-shadow:
+    0 0 5px #fff,
+    0 0 15px #fff,
+    0 0 30px #fff;
+}
+#enter-screen .enter-hint {
+  font-size: clamp(0.5rem, 1vw, 0.65rem);
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.35);
+  opacity: 0;
+  animation: pulse-in 1.5s ease forwards 1.2s;
+}
+@keyframes pulse-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ── VIDEO ── */
 video {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   object-fit: cover;
   opacity: 0;
   transition: opacity 1.5s ease;
   z-index: 0;
 }
-video.visible {
-  opacity: 1;
-}
+video.visible { opacity: 1; }
 
-/* ── FALLBACK BG (shown if video fails or is slow) ── */
+/* ── FALLBACK BG ── */
 .fallback-bg {
   position: fixed;
   inset: 0;
@@ -52,37 +81,28 @@ video.visible {
     #000;
 }
 
-/* ── EYE OPEN EFFECT ── */
+/* ── EYE OVERLAY ── */
 .cinematic-overlay {
-  position: fixed;
-  inset: 0;
+  position: fixed; inset: 0;
   z-index: 10;
   pointer-events: none;
 }
 .eye {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 50%;
+  position: absolute; left: 0;
+  width: 100%; height: 50%;
   background: #000;
   transition: transform 2s cubic-bezier(0.7, 0, 0.2, 1);
   will-change: transform;
 }
-.eye-top  { top: 0; }
+.eye-top    { top: 0; }
 .eye-bottom { bottom: 0; }
-
-.cinematic-overlay.open .eye-top {
-  transform: translateY(-100%);
-}
-.cinematic-overlay.open .eye-bottom {
-  transform: translateY(100%);
-}
+.cinematic-overlay.open .eye-top    { transform: translateY(-100%); }
+.cinematic-overlay.open .eye-bottom { transform: translateY(100%); }
 
 /* ── TEXT ── */
 .intro-text {
   position: fixed;
-  top: 50%;
-  left: 50%;
+  top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   font-size: clamp(0.9rem, 2.5vw, 2rem);
   color: #fff;
@@ -105,7 +125,6 @@ video.visible {
   opacity: 1;
   animation: flicker 3s infinite;
 }
-
 @keyframes flicker {
   0%, 100% { opacity: 1; }
   45%       { opacity: 0.85; }
@@ -113,83 +132,83 @@ video.visible {
   55%       { opacity: 0.95; }
 }
 
-/* ── SUBTLE SCANLINE OVERLAY ── */
+/* ── SCANLINES ── */
 .scanlines {
-  position: fixed;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
+  position: fixed; inset: 0;
+  z-index: 5; pointer-events: none;
   background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,0.04) 2px,
-    rgba(0,0,0,0.04) 4px
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px
   );
-  opacity: 0;
-  transition: opacity 2s ease;
+  opacity: 0; transition: opacity 2s ease;
 }
-.scanlines.visible {
-  opacity: 1;
-}
+.scanlines.visible { opacity: 1; }
 
 /* ── VIGNETTE ── */
 .vignette {
-  position: fixed;
-  inset: 0;
-  z-index: 6;
-  pointer-events: none;
-  background: radial-gradient(ellipse at center,
-    transparent 50%,
-    rgba(0,0,0,0.75) 100%
-  );
-  opacity: 0;
-  transition: opacity 2s ease;
+  position: fixed; inset: 0;
+  z-index: 6; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.75) 100%);
+  opacity: 0; transition: opacity 2s ease;
 }
-.vignette.visible {
-  opacity: 1;
-}
+.vignette.visible { opacity: 1; }
 </style>
 </head>
 <body>
+
+<!-- CLICK TO ENTER -->
+<div id="enter-screen">
+  <div class="enter-label">click to enter</div>
+  <div class="enter-hint">[ tap anywhere ]</div>
+</div>
 
 <!-- FALLBACK BACKGROUND -->
 <div class="fallback-bg"></div>
 
 <!-- VIDEO -->
-<video id="video" preload="auto" playsinline muted>
-  <source src="video.mp4" type="video/mp4">
-  <source src="video.webm" type="video/webm">
+<video id="video" preload="auto" playsinline muted loop>
+  <source src="Video.mp4" type="video/mp4">
 </video>
 
-<!-- ATMOSPHERIC LAYERS -->
 <div class="scanlines" id="scanlines"></div>
 <div class="vignette"  id="vignette"></div>
 
-<!-- EYE OVERLAY -->
 <div class="cinematic-overlay" id="overlay">
   <div class="eye eye-top"></div>
   <div class="eye eye-bottom"></div>
 </div>
 
-<!-- TEXT -->
 <div class="intro-text" id="text">
   @hollowdespair | .gg/shootem
 </div>
 
 <script>
 (function () {
-  const video    = document.getElementById('video');
-  const overlay  = document.getElementById('overlay');
-  const text     = document.getElementById('text');
-  const scanlines = document.getElementById('scanlines');
-  const vignette  = document.getElementById('vignette');
+  const enterScreen = document.getElementById('enter-screen');
+  const video       = document.getElementById('video');
+  const overlay     = document.getElementById('overlay');
+  const text        = document.getElementById('text');
+  const scanlines   = document.getElementById('scanlines');
+  const vignette    = document.getElementById('vignette');
 
-  let started = false;
+  video.load();
 
-  function startSequence() {
-    if (started) return;
-    started = true;
+  enterScreen.addEventListener('click', async () => {
+    // Fade out enter screen
+    enterScreen.classList.add('fade-out');
+    setTimeout(() => enterScreen.remove(), 1000);
+
+    // Unmute BEFORE play — user gesture makes this allowed
+    video.muted = false;
+    video.volume = 0;
+
+    try {
+      await video.play();
+    } catch (e) {
+      // If play fails, retry muted
+      video.muted = true;
+      await video.play().catch(() => {});
+    }
 
     // Fade in video
     video.classList.add('visible');
@@ -198,58 +217,24 @@ video.visible {
     setTimeout(() => {
       scanlines.classList.add('visible');
       vignette.classList.add('visible');
-    }, 500);
+    }, 400);
 
     // Open eyes
-    setTimeout(() => {
-      overlay.classList.add('open');
-    }, 300);
+    setTimeout(() => overlay.classList.add('open'), 300);
 
     // Show text
+    setTimeout(() => text.classList.add('show'), 1200);
+
+    // Fade volume in smoothly
     setTimeout(() => {
-      text.classList.add('show');
-    }, 1200);
-
-    // Unmute + fade volume in
-    setTimeout(() => {
-      video.muted = false;
-      video.volume = 0;
-      const fade = setInterval(() => {
-        video.volume = Math.min(video.volume + 0.02, 1);
-        if (video.volume >= 1) clearInterval(fade);
-      }, 80);
-    }, 1500);
-  }
-
-  // Fallback: if video never fires canplaythrough (slow network, blocked, missing)
-  // still run the sequence after a short timeout
-  const fallbackTimer = setTimeout(() => {
-    startSequence();
-  }, 3000);
-
-  // Primary trigger — fires when enough data is buffered
-  video.addEventListener('canplaythrough', () => {
-    clearTimeout(fallbackTimer);
-    video.play().catch(() => {});
-    startSequence();
+      if (!video.muted) {
+        const fade = setInterval(() => {
+          video.volume = Math.min(video.volume + 0.02, 1);
+          if (video.volume >= 1) clearInterval(fade);
+        }, 80);
+      }
+    }, 500);
   }, { once: true });
-
-  // Secondary trigger for faster devices (data starts arriving)
-  video.addEventListener('loadeddata', () => {
-    if (!started) {
-      clearTimeout(fallbackTimer);
-      video.play().catch(() => {});
-      startSequence();
-    }
-  }, { once: true });
-
-  // If video errors (file missing, format unsupported) — still show sequence
-  video.addEventListener('error', () => {
-    clearTimeout(fallbackTimer);
-    startSequence();
-  }, { once: true });
-
-  video.load();
 })();
 </script>
 </body>

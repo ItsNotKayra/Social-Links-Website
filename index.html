@@ -439,8 +439,8 @@ video.visible { opacity: 1; }
       if (!video.muted) {
         const fade = setInterval(() => {
           video.volume = Math.min(video.volume + 0.02, 1);
-          updateTrack(Math.round(video.volume * 100));
-          volSlider.value = Math.round(video.volume * 100);
+          updateTrack(Math.round(video.volume * 50));
+          volSlider.value = Math.round(video.volume * 50);
           if (video.volume >= 1) clearInterval(fade);
         }, 80);
       }

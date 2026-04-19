@@ -27,11 +27,8 @@ html, body {
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
-  box-shadow:
-    0 0 6px #fff,
-    0 0 12px #fff,
-    0 0 24px rgba(255,255,255,0.6);
-  transition: width 0.15s, height 0.15s, background 0.15s;
+  box-shadow: 0 0 6px #fff, 0 0 12px #fff, 0 0 24px rgba(255,255,255,0.6);
+  transition: width 0.15s, height 0.15s;
 }
 #cursor-ring {
   position: fixed;
@@ -41,15 +38,8 @@ html, body {
   pointer-events: none;
   z-index: 9998;
   transform: translate(-50%, -50%);
-  transition: transform 0.12s ease, width 0.2s, height 0.2s, border-color 0.2s;
-  box-shadow:
-    0 0 8px rgba(255,255,255,0.2),
-    inset 0 0 8px rgba(255,255,255,0.05);
-}
-#cursor-trail {
-  position: fixed;
-  pointer-events: none;
-  z-index: 9997;
+  box-shadow: 0 0 8px rgba(255,255,255,0.2), inset 0 0 8px rgba(255,255,255,0.05);
+  transition: width 0.2s, height 0.2s, border-color 0.2s;
 }
 .trail-particle {
   position: fixed;
@@ -62,50 +52,34 @@ html, body {
   from { opacity: 0.6; width: 6px; height: 6px; }
   to   { opacity: 0; width: 2px; height: 2px; }
 }
-
-/* hover state — bigger ring */
 body.cursor-hover #cursor-ring {
   width: 54px; height: 54px;
   border-color: rgba(255,255,255,0.9);
   box-shadow: 0 0 20px rgba(255,255,255,0.4), inset 0 0 12px rgba(255,255,255,0.1);
 }
-body.cursor-hover #cursor-dot {
-  width: 4px; height: 4px;
-}
+body.cursor-hover #cursor-dot { width: 4px; height: 4px; }
 
 /* ══════════════════════════════
    CLICK TO ENTER
 ══════════════════════════════ */
 #enter-screen {
-  position: fixed; inset: 0;
-  z-index: 100;
+  position: fixed; inset: 0; z-index: 100;
   background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
   gap: 24px;
   transition: opacity 1s ease;
 }
-#enter-screen.fade-out {
-  opacity: 0;
-  pointer-events: none;
-}
+#enter-screen.fade-out { opacity: 0; pointer-events: none; }
 .enter-label {
   font-size: clamp(0.7rem, 1.5vw, 1rem);
-  letter-spacing: 8px;
-  color: #fff;
-  text-transform: uppercase;
-  opacity: 0;
-  animation: pulse-in 1.5s ease forwards 0.5s;
+  letter-spacing: 8px; color: #fff; text-transform: uppercase;
+  opacity: 0; animation: pulse-in 1.5s ease forwards 0.5s;
   text-shadow: 0 0 5px #fff, 0 0 15px #fff, 0 0 30px #fff;
 }
 .enter-hint {
   font-size: clamp(0.45rem, 0.9vw, 0.6rem);
-  letter-spacing: 4px;
-  color: rgba(255,255,255,0.3);
-  opacity: 0;
-  animation: pulse-in 1.5s ease forwards 1.2s;
+  letter-spacing: 4px; color: rgba(255,255,255,0.3);
+  opacity: 0; animation: pulse-in 1.5s ease forwards 1.2s;
 }
 @keyframes pulse-in {
   from { opacity: 0; transform: translateY(8px); }
@@ -113,24 +87,19 @@ body.cursor-hover #cursor-dot {
 }
 
 /* ══════════════════════════════
-   VIDEO
+   VIDEO + FALLBACK
 ══════════════════════════════ */
 video {
-  position: fixed; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 1.5s ease;
-  z-index: 0;
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0;
+  transition: opacity 1.5s ease; z-index: 0;
 }
 video.visible { opacity: 1; }
-
 .fallback-bg {
   position: fixed; inset: 0; z-index: 0;
   background:
     radial-gradient(ellipse at 30% 40%, #1a0a2e 0%, transparent 60%),
-    radial-gradient(ellipse at 70% 70%, #0d1a2e 0%, transparent 60%),
-    #000;
+    radial-gradient(ellipse at 70% 70%, #0d1a2e 0%, transparent 60%), #000;
 }
 
 /* ══════════════════════════════
@@ -138,14 +107,10 @@ video.visible { opacity: 1; }
 ══════════════════════════════ */
 .scanlines {
   position: fixed; inset: 0; z-index: 5; pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg, transparent, transparent 2px,
-    rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px
-  );
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px);
   opacity: 0; transition: opacity 2s ease;
 }
 .scanlines.visible { opacity: 1; }
-
 .vignette {
   position: fixed; inset: 0; z-index: 6; pointer-events: none;
   background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.85) 100%);
@@ -156,12 +121,9 @@ video.visible { opacity: 1; }
 /* ══════════════════════════════
    EYE OVERLAY
 ══════════════════════════════ */
-.cinematic-overlay {
-  position: fixed; inset: 0; z-index: 10; pointer-events: none;
-}
+.cinematic-overlay { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
 .eye {
-  position: absolute; left: 0;
-  width: 100%; height: 50%;
+  position: absolute; left: 0; width: 100%; height: 50%;
   background: #000;
   transition: transform 2s cubic-bezier(0.7, 0, 0.2, 1);
   will-change: transform;
@@ -172,108 +134,54 @@ video.visible { opacity: 1; }
 .cinematic-overlay.open .eye-bottom { transform: translateY(100%); }
 
 /* ══════════════════════════════
-   VOLUME SLIDER — TOP LEFT
+   VOLUME SLIDER
 ══════════════════════════════ */
 #volume-control {
-  position: fixed;
-  top: 28px; left: 28px;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  opacity: 0;
-  transform: translateX(-10px);
+  position: fixed; top: 28px; left: 28px; z-index: 50;
+  display: flex; align-items: center; gap: 12px;
+  opacity: 0; transform: translateX(-10px);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
-#volume-control.visible {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.vol-icon {
-  width: 18px; height: 18px;
-  flex-shrink: 0;
-  opacity: 0.85;
-}
-
-/* custom range slider */
+#volume-control.visible { opacity: 1; transform: translateX(0); }
+.vol-icon { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.85; }
 #volume-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 110px;
-  height: 3px;
-  border-radius: 2px;
-  outline: none;
-  background: linear-gradient(
-    to right,
-    #fff 0%,
-    #fff var(--val, 100%),
-    rgba(255,255,255,0.15) var(--val, 100%),
-    rgba(255,255,255,0.15) 100%
-  );
+  -webkit-appearance: none; appearance: none;
+  width: 110px; height: 3px; border-radius: 2px; outline: none;
+  background: linear-gradient(to right, #fff 0%, #fff var(--val, 100%), rgba(255,255,255,0.15) var(--val, 100%), rgba(255,255,255,0.15) 100%);
   box-shadow: 0 0 6px rgba(255,255,255,0.4), 0 0 12px rgba(255,255,255,0.15);
   cursor: none;
 }
 #volume-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow:
-    0 0 4px #fff,
-    0 0 10px #fff,
-    0 0 20px rgba(255,255,255,0.7);
-  cursor: none;
+  -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%;
+  background: #fff; cursor: none;
+  box-shadow: 0 0 4px #fff, 0 0 10px #fff, 0 0 20px rgba(255,255,255,0.7);
   transition: transform 0.15s;
 }
-#volume-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.3);
-}
+#volume-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
 #volume-slider::-moz-range-thumb {
-  width: 12px; height: 12px;
-  border: none;
-  border-radius: 50%;
-  background: #fff;
+  width: 12px; height: 12px; border: none; border-radius: 50%;
+  background: #fff; cursor: none;
   box-shadow: 0 0 4px #fff, 0 0 10px #fff, 0 0 20px rgba(255,255,255,0.7);
-  cursor: none;
 }
 
 /* ══════════════════════════════
    CENTER TEXT
 ══════════════════════════════ */
 .intro-text {
-  position: fixed;
-  top: 50%; left: 50%;
+  position: fixed; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 28px;
-  z-index: 20;
-  opacity: 0;
-  transition: opacity 1.5s ease;
-  pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 28px;
+  z-index: 20; opacity: 0; transition: opacity 1.5s ease;
   user-select: none;
 }
-.intro-text.show {
-  opacity: 1;
-}
-
+.intro-text.show { opacity: 1; }
 .intro-label {
   font-size: clamp(0.9rem, 2.5vw, 2rem);
-  letter-spacing: 4px;
-  text-align: center;
-  white-space: nowrap;
-  /* mix-blend-mode makes it use opposite/contrast color vs background */
-  mix-blend-mode: difference;
-  color: #fff;
-  opacity: 0.9;
-  animation: none;
+  letter-spacing: 4px; text-align: center; white-space: nowrap;
+  mix-blend-mode: difference; color: #fff; opacity: 0.9;
+  pointer-events: none;
 }
-.intro-text.show .intro-label {
-  animation: flicker 3s infinite;
-}
-
+.intro-text.show .intro-label { animation: flicker 3s infinite; }
 @keyframes flicker {
   0%, 100% { opacity: 0.9; }
   45%       { opacity: 0.75; }
@@ -284,66 +192,109 @@ video.visible { opacity: 1; }
 /* ══════════════════════════════
    JOIN US BUTTON
 ══════════════════════════════ */
+.join-btn-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .join-btn {
   pointer-events: all;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+  display: inline-flex; align-items: center; gap: 10px;
   padding: 9px 28px;
   font-family: 'Orbitron', sans-serif;
   font-size: clamp(0.5rem, 1vw, 0.65rem);
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: #fff;
+  letter-spacing: 5px; text-transform: uppercase;
+  text-decoration: none; color: #fff;
   background: transparent;
   border: 1px solid rgba(255,255,255,0.4);
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.3s, color 0.3s;
+  position: relative; overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
   mix-blend-mode: difference;
+  cursor: none;
 }
 .join-btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
+  content: ''; position: absolute; inset: 0;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
-  transform: translateX(-100%);
-  transition: transform 0.5s ease;
+  transform: translateX(-100%); transition: transform 0.5s ease;
 }
-.join-btn:hover::before {
-  transform: translateX(100%);
-}
+.join-btn:hover::before { transform: translateX(100%); }
 .join-btn:hover {
   border-color: rgba(255,255,255,0.95);
-  box-shadow:
-    0 0 8px rgba(255,255,255,0.3),
-    0 0 20px rgba(255,255,255,0.15),
-    inset 0 0 8px rgba(255,255,255,0.05);
+  box-shadow: 0 0 8px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.15), inset 0 0 8px rgba(255,255,255,0.05);
 }
-/* discord icon svg inline */
-.join-btn svg {
-  width: 13px; height: 13px;
-  fill: currentColor;
-  flex-shrink: 0;
-}
-
-/* corner decorations on button */
+.join-btn svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
 .join-btn .corner {
-  position: absolute;
-  width: 5px; height: 5px;
-  border-color: #fff;
-  border-style: solid;
-  opacity: 0.7;
+  position: absolute; width: 5px; height: 5px;
+  border-color: #fff; border-style: solid; opacity: 0.7;
 }
-.join-btn .corner.tl { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
-.join-btn .corner.tr { top: -1px; right: -1px; border-width: 1px 1px 0 0; }
+.join-btn .corner.tl { top: -1px; left: -1px;   border-width: 1px 0 0 1px; }
+.join-btn .corner.tr { top: -1px; right: -1px;  border-width: 1px 1px 0 0; }
 .join-btn .corner.bl { bottom: -1px; left: -1px; border-width: 0 0 1px 1px; }
-.join-btn .corner.br { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+.join-btn .corner.br { bottom: -1px; right: -1px;border-width: 0 1px 1px 0; }
 
 /* ══════════════════════════════
-   SCANLINES & VIGNETTE
+   DISCORD WIDGET POPUP
 ══════════════════════════════ */
+#discord-widget-popup {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  width: 320px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05),
+    0 0 30px rgba(255,255,255,0.08),
+    0 0 60px rgba(255,255,255,0.04),
+    0 20px 60px rgba(0,0,0,0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 200;
+  mix-blend-mode: normal;
+}
+/* small arrow pointing down to button */
+#discord-widget-popup::after {
+  content: '';
+  position: absolute;
+  bottom: -6px; left: 50%;
+  transform: translateX(-50%);
+  width: 10px; height: 6px;
+  background: rgba(255,255,255,0.15);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+#discord-widget-popup.visible {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* top bar of widget popup */
+.widget-header {
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; gap: 8px;
+}
+.widget-header svg { width: 16px; height: 16px; fill: rgba(255,255,255,0.7); flex-shrink: 0; }
+.widget-header span {
+  font-size: 0.55rem; letter-spacing: 4px; text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
+#discord-widget-popup iframe {
+  display: block;
+  width: 100%;
+  height: 420px;
+  border: none;
+  background: transparent;
+}
 </style>
 </head>
 <body>
@@ -358,28 +309,24 @@ video.visible { opacity: 1; }
   <div class="enter-hint">[ tap anywhere ]</div>
 </div>
 
-<!-- FALLBACK BG -->
 <div class="fallback-bg"></div>
 
-<!-- VIDEO -->
 <video id="video" preload="auto" playsinline muted loop>
-  <source src="video.mp4" type="video/mp4">
+  <source src="Video.mp4" type="video/mp4">
 </video>
 
 <div class="scanlines" id="scanlines"></div>
 <div class="vignette"  id="vignette"></div>
 
-<!-- EYE OVERLAY -->
 <div class="cinematic-overlay" id="overlay">
   <div class="eye eye-top"></div>
   <div class="eye eye-bottom"></div>
 </div>
 
-<!-- VOLUME CONTROL -->
+<!-- VOLUME -->
 <div id="volume-control">
-  <!-- speaker icon -->
-  <svg class="vol-icon" id="vol-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path id="vol-path" d="M11 5L6 9H2v6h4l5 4V5z" fill="white" opacity="0.85"/>
+  <svg class="vol-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11 5L6 9H2v6h4l5 4V5z" fill="white" opacity="0.85"/>
     <path id="vol-wave1" d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.85"/>
     <path id="vol-wave2" d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/>
   </svg>
@@ -389,16 +336,35 @@ video.visible { opacity: 1; }
 <!-- CENTER TEXT + BUTTON -->
 <div class="intro-text" id="text">
   <span class="intro-label">@hollowdespair | .gg/shootem</span>
-  <a class="join-btn" href="https://discord.gg/shootem" target="_blank" rel="noopener">
-    <span class="corner tl"></span>
-    <span class="corner tr"></span>
-    <span class="corner bl"></span>
-    <span class="corner br"></span>
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-    </svg>
-    join us
-  </a>
+
+  <div class="join-btn-wrap" id="join-wrap">
+    <!-- DISCORD WIDGET POPUP -->
+    <div id="discord-widget-popup">
+      <div class="widget-header">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+        </svg>
+        <span>hollowdespair</span>
+      </div>
+      <iframe
+        src="https://discord.com/widget?id=1494733304899960922&theme=dark"
+        allowtransparency="true"
+        frameborder="0"
+        sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
+      </iframe>
+    </div>
+
+    <a class="join-btn" id="join-btn" href="https://discord.gg/shootem" target="_blank" rel="noopener">
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+      </svg>
+      join us
+    </a>
+  </div>
 </div>
 
 <script>
@@ -415,18 +381,17 @@ video.visible { opacity: 1; }
   const volWave2     = document.getElementById('vol-wave2');
   const cursorDot    = document.getElementById('cursor-dot');
   const cursorRing   = document.getElementById('cursor-ring');
+  const joinWrap     = document.getElementById('join-wrap');
+  const discordPopup = document.getElementById('discord-widget-popup');
 
   /* ── CURSOR ── */
-  let mx = -100, my = -100;
-  let rx = -100, ry = -100;
-  let trailTimeout;
+  let mx = -100, my = -100, rx = -100, ry = -100;
 
   document.addEventListener('mousemove', e => {
     mx = e.clientX; my = e.clientY;
     cursorDot.style.left = mx + 'px';
     cursorDot.style.top  = my + 'px';
 
-    // trail particle
     const p = document.createElement('div');
     p.className = 'trail-particle';
     p.style.left = mx + 'px';
@@ -440,36 +405,46 @@ video.visible { opacity: 1; }
     setTimeout(() => p.remove(), 500);
   });
 
-  // ring lags behind slightly
-  function animateRing() {
+  (function animateRing() {
     rx += (mx - rx) * 0.12;
     ry += (my - ry) * 0.12;
     cursorRing.style.left = rx + 'px';
     cursorRing.style.top  = ry + 'px';
     requestAnimationFrame(animateRing);
-  }
-  animateRing();
+  })();
 
-  // hover effect on interactive elements
   document.querySelectorAll('a, input, button, #enter-screen').forEach(el => {
     el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
   });
 
-  /* ── VOLUME SLIDER ── */
+  /* ── DISCORD WIDGET HOVER ── */
+  let hideTimeout;
+
+  joinWrap.addEventListener('mouseenter', () => {
+    clearTimeout(hideTimeout);
+    discordPopup.classList.add('visible');
+  });
+
+  joinWrap.addEventListener('mouseleave', () => {
+    // small delay so moving into the iframe doesn't flicker
+    hideTimeout = setTimeout(() => {
+      discordPopup.classList.remove('visible');
+    }, 200);
+  });
+
+  discordPopup.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+  discordPopup.addEventListener('mouseleave', () => {
+    hideTimeout = setTimeout(() => {
+      discordPopup.classList.remove('visible');
+    }, 200);
+  });
+
+  /* ── VOLUME ── */
   function updateSliderTrack(val) {
     volSlider.style.setProperty('--val', val + '%');
-    // mute icon states
-    if (val == 0) {
-      volWave1.style.opacity = '0';
-      volWave2.style.opacity = '0';
-    } else if (val < 50) {
-      volWave1.style.opacity = '0.85';
-      volWave2.style.opacity = '0';
-    } else {
-      volWave1.style.opacity = '0.85';
-      volWave2.style.opacity = '0.5';
-    }
+    volWave1.style.opacity = val == 0 ? '0' : '0.85';
+    volWave2.style.opacity = val < 50 ? '0' : '0.5';
   }
 
   volSlider.addEventListener('input', () => {
@@ -489,27 +464,16 @@ video.visible { opacity: 1; }
     video.muted  = false;
     video.volume = 0;
 
-    try {
-      await video.play();
-    } catch (e) {
-      video.muted = true;
-      await video.play().catch(() => {});
-    }
+    try { await video.play(); }
+    catch (e) { video.muted = true; await video.play().catch(() => {}); }
 
     video.classList.add('visible');
 
-    setTimeout(() => {
-      scanlines.classList.add('visible');
-      vignette.classList.add('visible');
-    }, 400);
-
+    setTimeout(() => { scanlines.classList.add('visible'); vignette.classList.add('visible'); }, 400);
     setTimeout(() => overlay.classList.add('open'), 300);
     setTimeout(() => text.classList.add('show'), 1200);
-
-    // show volume control
     setTimeout(() => volControl.classList.add('visible'), 1600);
 
-    // fade volume in
     setTimeout(() => {
       if (!video.muted) {
         const fade = setInterval(() => {

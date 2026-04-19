@@ -3,31 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>hollowdespair</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-
 <style>
 :root {
   --bg: #000;
   --white: #fff;
 }
 
-/* RESET */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
+html, body {
+  width: 100%;
+  height: 100%;
   background: #000;
   overflow: hidden;
   font-family: 'Orbitron', sans-serif;
+  cursor: none;
 }
 
-/* VIDEO */
+/* ── VIDEO ── */
 video {
   position: fixed;
   inset: 0;
@@ -36,20 +35,30 @@ video {
   object-fit: cover;
   opacity: 0;
   transition: opacity 1.5s ease;
+  z-index: 0;
 }
-
 video.visible {
   opacity: 1;
 }
 
-/* EYE OPEN EFFECT */
+/* ── FALLBACK BG (shown if video fails or is slow) ── */
+.fallback-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 30% 40%, #1a0a2e 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 70%, #0d1a2e 0%, transparent 60%),
+    #000;
+}
+
+/* ── EYE OPEN EFFECT ── */
 .cinematic-overlay {
   position: fixed;
   inset: 0;
   z-index: 10;
   pointer-events: none;
 }
-
 .eye {
   position: absolute;
   left: 0;
@@ -57,80 +66,105 @@ video.visible {
   height: 50%;
   background: #000;
   transition: transform 2s cubic-bezier(0.7, 0, 0.2, 1);
+  will-change: transform;
 }
-
-.eye-top {
-  top: 0;
-}
-
-.eye-bottom {
-  bottom: 0;
-}
+.eye-top  { top: 0; }
+.eye-bottom { bottom: 0; }
 
 .cinematic-overlay.open .eye-top {
   transform: translateY(-100%);
 }
-
 .cinematic-overlay.open .eye-bottom {
   transform: translateY(100%);
 }
 
-/* TEXT */
+/* ── TEXT ── */
 .intro-text {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 2rem;
+  font-size: clamp(0.9rem, 2.5vw, 2rem);
   color: #fff;
   opacity: 0;
   letter-spacing: 4px;
   text-align: center;
   z-index: 20;
-
+  white-space: nowrap;
   text-shadow:
     0 0 5px #fff,
     0 0 10px #fff,
     0 0 20px #fff,
     0 0 40px #fff,
     0 0 80px #fff;
-
   transition: opacity 1.5s ease;
+  pointer-events: none;
+  user-select: none;
 }
-
 .intro-text.show {
   opacity: 1;
-}
-
-/* subtle flicker */
-@keyframes flicker {
-  0%, 100% { opacity: 1; }
-  45% { opacity: 0.8; }
-  50% { opacity: 0.4; }
-  55% { opacity: 0.9; }
-}
-
-.intro-text.show {
   animation: flicker 3s infinite;
 }
 
-/* MOBILE */
-@media (max-width: 600px) {
-  .intro-text {
-    font-size: 1.2rem;
-    letter-spacing: 2px;
-  }
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  45%       { opacity: 0.85; }
+  50%       { opacity: 0.35; }
+  55%       { opacity: 0.95; }
+}
+
+/* ── SUBTLE SCANLINE OVERLAY ── */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.04) 2px,
+    rgba(0,0,0,0.04) 4px
+  );
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+.scanlines.visible {
+  opacity: 1;
+}
+
+/* ── VIGNETTE ── */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center,
+    transparent 50%,
+    rgba(0,0,0,0.75) 100%
+  );
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+.vignette.visible {
+  opacity: 1;
 }
 </style>
 </head>
-
 <body>
 
+<!-- FALLBACK BACKGROUND -->
+<div class="fallback-bg"></div>
+
 <!-- VIDEO -->
-<video id="video" preload="auto" playsinline>
+<video id="video" preload="auto" playsinline muted>
   <source src="video.mp4" type="video/mp4">
   <source src="video.webm" type="video/webm">
 </video>
+
+<!-- ATMOSPHERIC LAYERS -->
+<div class="scanlines" id="scanlines"></div>
+<div class="vignette"  id="vignette"></div>
 
 <!-- EYE OVERLAY -->
 <div class="cinematic-overlay" id="overlay">
@@ -144,50 +178,79 @@ video.visible {
 </div>
 
 <script>
-const video = document.getElementById('video');
-const overlay = document.getElementById('overlay');
-const text = document.getElementById('text');
+(function () {
+  const video    = document.getElementById('video');
+  const overlay  = document.getElementById('overlay');
+  const text     = document.getElementById('text');
+  const scanlines = document.getElementById('scanlines');
+  const vignette  = document.getElementById('vignette');
 
-// Start muted (required by browsers)
-video.muted = true;
-video.volume = 0;
+  let started = false;
 
-// Wait until video is fully loaded
-video.addEventListener('canplaythrough', async () => {
-  try {
-    await video.play();
-  } catch (e) {}
+  function startSequence() {
+    if (started) return;
+    started = true;
 
-  // Fade in video
-  video.classList.add('visible');
+    // Fade in video
+    video.classList.add('visible');
 
-  // Open eyes
-  setTimeout(() => {
-    overlay.classList.add('open');
-  }, 300);
+    // Atmospheric layers
+    setTimeout(() => {
+      scanlines.classList.add('visible');
+      vignette.classList.add('visible');
+    }, 500);
 
-  // Show text
-  setTimeout(() => {
-    text.classList.add('show');
-  }, 1200);
+    // Open eyes
+    setTimeout(() => {
+      overlay.classList.add('open');
+    }, 300);
 
-  // Fade in sound smoothly
-  setTimeout(() => {
-    video.muted = false;
+    // Show text
+    setTimeout(() => {
+      text.classList.add('show');
+    }, 1200);
 
-    let vol = 0;
-    const fade = setInterval(() => {
-      vol += 0.02;
-      video.volume = Math.min(vol, 1);
+    // Unmute + fade volume in
+    setTimeout(() => {
+      video.muted = false;
+      video.volume = 0;
+      const fade = setInterval(() => {
+        video.volume = Math.min(video.volume + 0.02, 1);
+        if (video.volume >= 1) clearInterval(fade);
+      }, 80);
+    }, 1500);
+  }
 
-      if (vol >= 1) clearInterval(fade);
-    }, 100);
-  }, 1500);
-});
+  // Fallback: if video never fires canplaythrough (slow network, blocked, missing)
+  // still run the sequence after a short timeout
+  const fallbackTimer = setTimeout(() => {
+    startSequence();
+  }, 3000);
 
-// Start loading immediately
-video.load();
+  // Primary trigger — fires when enough data is buffered
+  video.addEventListener('canplaythrough', () => {
+    clearTimeout(fallbackTimer);
+    video.play().catch(() => {});
+    startSequence();
+  }, { once: true });
+
+  // Secondary trigger for faster devices (data starts arriving)
+  video.addEventListener('loadeddata', () => {
+    if (!started) {
+      clearTimeout(fallbackTimer);
+      video.play().catch(() => {});
+      startSequence();
+    }
+  }, { once: true });
+
+  // If video errors (file missing, format unsupported) — still show sequence
+  video.addEventListener('error', () => {
+    clearTimeout(fallbackTimer);
+    startSequence();
+  }, { once: true });
+
+  video.load();
+})();
 </script>
-
 </body>
 </html>

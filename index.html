@@ -1,0 +1,2691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@hollowdespair</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: #000;
+  overflow: hidden;
+  /* Terminal / hacker vibe — JetBrains Mono with system mono fallbacks */
+  font-family: "JetBrains Mono", "Fira Code", "SF Mono", "Menlo",
+               "Consolas", "Courier New", monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+  cursor: none;
+}
+
+/* ══════════════════════════════
+   CUSTOM NEON CURSOR
+══════════════════════════════ */
+#cursor-dot {
+  position: fixed;
+  width: 8px; height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 6px #fff,
+    0 0 12px #fff,
+    0 0 24px rgba(255,255,255,0.6);
+  transition: width 0.15s, height 0.15s, background 0.15s;
+}
+#cursor-ring {
+  position: fixed;
+  width: 36px; height: 36px;
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: transform 0.12s ease, width 0.2s, height 0.2s, border-color 0.2s;
+  box-shadow:
+    0 0 8px rgba(255,255,255,0.2),
+    inset 0 0 8px rgba(255,255,255,0.05);
+}
+#cursor-trail {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9997;
+}
+.trail-particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: trail-fade 0.5s ease forwards;
+}
+@keyframes trail-fade {
+  from { opacity: 0.6; width: 6px; height: 6px; }
+  to   { opacity: 0; width: 2px; height: 2px; }
+}
+
+/* hover state — bigger ring */
+body.cursor-hover #cursor-ring {
+  width: 54px; height: 54px;
+  border-color: rgba(255,255,255,0.9);
+  box-shadow: 0 0 20px rgba(255,255,255,0.4), inset 0 0 12px rgba(255,255,255,0.1);
+}
+body.cursor-hover #cursor-dot {
+  width: 4px; height: 4px;
+}
+
+/* click / press feedback — subtle squeeze + pop */
+body.cursor-pressed #cursor-ring {
+  width: 22px; height: 22px;
+  border-color: rgba(255,255,255,1);
+  box-shadow: 0 0 18px rgba(255,255,255,0.5), inset 0 0 10px rgba(255,255,255,0.15);
+}
+body.cursor-pressed #cursor-dot {
+  width: 10px; height: 10px;
+  box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 36px rgba(255,255,255,0.8);
+}
+
+/* fade cursor when mouse leaves the window */
+#cursor-dot, #cursor-ring {
+  opacity: 1;
+  transition: opacity 0.25s ease,
+              width 0.2s, height 0.2s,
+              background 0.15s, border-color 0.2s, box-shadow 0.22s ease;
+}
+body.cursor-gone #cursor-dot,
+body.cursor-gone #cursor-ring {
+  opacity: 0;
+}
+
+/* ══════════════════════════════
+   CLICK TO ENTER — minimal dark terminal
+   Pure black background, clean white typography with subtle glow.
+   No color washes, no chromatic glitch, no diagnostic noise.
+══════════════════════════════ */
+#enter-screen {
+  position: fixed; inset: 0;
+  z-index: 100;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+  transition: opacity 1s ease;
+  cursor: pointer;
+  overflow: hidden;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+#enter-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 4 minimal corner brackets */
+.enter-corner {
+  position: absolute;
+  width: 40px; height: 40px;
+  border-color: rgba(255,255,255,0.22);
+  border-style: solid;
+  z-index: 3;
+  opacity: 0;
+  animation: enter-corner-in 0.5s cubic-bezier(0.2,0.7,0.2,1) forwards 0.1s;
+}
+.enter-corner.tl { top: 28px; left: 28px;     border-width: 1px 0 0 1px; }
+.enter-corner.tr { top: 28px; right: 28px;    border-width: 1px 1px 0 0; animation-delay: 0.18s; }
+.enter-corner.bl { bottom: 28px; left: 28px;  border-width: 0 0 1px 1px; animation-delay: 0.24s; }
+.enter-corner.br { bottom: 28px; right: 28px; border-width: 0 1px 1px 0; animation-delay: 0.30s; }
+@keyframes enter-corner-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1);   }
+}
+
+/* central content column */
+.enter-content {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding: 0 24px;
+  text-align: center;
+}
+
+/* clean white title with soft glow */
+.enter-title {
+  font-size: clamp(1.6rem, 4.2vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: 5px;
+  color: #fff;
+  text-transform: uppercase;
+  line-height: 1;
+  opacity: 0;
+  animation: enter-fade-in 0.8s ease forwards 0.3s;
+  text-shadow:
+    0 0 8px  rgba(255,255,255,0.35),
+    0 0 22px rgba(255,255,255,0.18);
+}
+
+/* thin loading bar — pure white */
+.enter-bar {
+  width: min(60vw, 220px);
+  height: 2px;
+  border-radius: 1px;
+  overflow: hidden;
+  position: relative;
+  background: rgba(255,255,255,0.08);
+  opacity: 0;
+  animation: enter-fade-in 0.5s ease forwards 0.5s;
+}
+.enter-bar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 0%;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(255,255,255,0.55);
+  animation: enter-bar-fill 1.8s cubic-bezier(0.3, 0.05, 0.2, 1) forwards 0.7s;
+}
+@keyframes enter-bar-fill {
+  0%   { width: 0%; }
+  100% { width: 100%; }
+}
+
+/* prompt label — subtle, white, breathing glow */
+.enter-label {
+  margin-top: 4px;
+  font-size: clamp(0.7rem, 1.3vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 3.5px;
+  color: #fff;
+  text-transform: uppercase;
+  opacity: 0;
+  animation:
+    enter-fade-in 0.7s ease forwards 2.1s,
+    label-pulse 2.8s ease-in-out infinite 2.7s;
+}
+.enter-label::after {
+  content: ' _';
+  color: rgba(255,255,255,0.7);
+  animation: ip-caret 0.7s steps(2,end) infinite;
+}
+@keyframes label-pulse {
+  0%, 100% { text-shadow: 0 0 6px  rgba(255,255,255,0.35),
+                          0 0 18px rgba(255,255,255,0.12); }
+  50%      { text-shadow: 0 0 10px rgba(255,255,255,0.75),
+                          0 0 26px rgba(255,255,255,0.3); }
+}
+
+.enter-hint {
+  font-size: clamp(0.5rem, 0.9vw, 0.6rem);
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  opacity: 0;
+  animation: enter-fade-in 0.7s ease forwards 2.3s;
+}
+
+@keyframes enter-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+/* ══════════════════════════════
+   VIDEO
+══════════════════════════════ */
+video {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  z-index: 0;
+}
+video.visible { opacity: 1; }
+
+.fallback-bg {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse at 30% 40%, #1a0a2e 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 70%, #0d1a2e 0%, transparent 60%),
+    #000;
+}
+
+/* ══════════════════════════════
+   ATMOSPHERIC LAYERS
+══════════════════════════════ */
+.scanlines {
+  position: fixed; inset: 0; z-index: 5; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px
+  );
+  opacity: 0; transition: opacity 2s ease;
+}
+.scanlines.visible { opacity: 1; }
+
+.vignette {
+  position: fixed; inset: 0; z-index: 6; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.85) 100%);
+  opacity: 0; transition: opacity 2s ease;
+}
+.vignette.visible { opacity: 1; }
+
+/* ══════════════════════════════
+   EYE OVERLAY
+══════════════════════════════ */
+.cinematic-overlay {
+  position: fixed; inset: 0; z-index: 10; pointer-events: none;
+}
+.eye {
+  position: absolute; left: 0;
+  width: 100%; height: 50%;
+  background: #000;
+  transition: transform 2s cubic-bezier(0.7, 0, 0.2, 1);
+  will-change: transform;
+}
+.eye-top    { top: 0; }
+.eye-bottom { bottom: 0; }
+.cinematic-overlay.open .eye-top    { transform: translateY(-100%); }
+.cinematic-overlay.open .eye-bottom { transform: translateY(100%); }
+
+/* ══════════════════════════════
+   VOLUME SLIDER — TOP LEFT
+══════════════════════════════ */
+#volume-control {
+  position: fixed;
+  top: 28px; left: 28px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+#volume-control.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.vol-icon {
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+/* custom range slider */
+#volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 110px;
+  height: 3px;
+  border-radius: 2px;
+  outline: none;
+  background: linear-gradient(
+    to right,
+    #fff 0%,
+    #fff var(--val, 100%),
+    rgba(255,255,255,0.15) var(--val, 100%),
+    rgba(255,255,255,0.15) 100%
+  );
+  box-shadow: 0 0 6px rgba(255,255,255,0.4), 0 0 12px rgba(255,255,255,0.15);
+  cursor: none;
+}
+#volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 4px #fff,
+    0 0 10px #fff,
+    0 0 20px rgba(255,255,255,0.7);
+  cursor: none;
+  transition: transform 0.15s;
+}
+#volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.3);
+}
+#volume-slider::-moz-range-thumb {
+  width: 12px; height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 4px #fff, 0 0 10px #fff, 0 0 20px rgba(255,255,255,0.7);
+  cursor: none;
+}
+
+/* ══════════════════════════════
+   CENTER TEXT
+══════════════════════════════ */
+.intro-text {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+  user-select: none;
+  /* 3D stage for the card — preserve-3d lets child translateZ actually
+     render in depth instead of being flattened by .intro-text's translate */
+  perspective: 900px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+}
+.intro-text.show {
+  opacity: 1;
+}
+
+.intro-label {
+  font-size: clamp(0.95rem, 2.3vw, 1.9rem);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-align: center;
+  white-space: nowrap;
+  /* mix-blend-mode makes it use opposite/contrast color vs background */
+  mix-blend-mode: difference;
+  color: #fff;
+  opacity: 0.95;
+  animation: none;
+}
+.intro-text.show .intro-label {
+  animation: flicker 3s infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 0.9; }
+  45%       { opacity: 0.75; }
+  50%       { opacity: 0.3; }
+  55%       { opacity: 0.88; }
+}
+
+/* ══════════════════════════════
+   JOIN US BUTTON
+══════════════════════════════ */
+.join-btn {
+  pointer-events: all;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 28px;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: clamp(0.55rem, 1.05vw, 0.7rem);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #fff;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.4);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, color 0.3s;
+  mix-blend-mode: difference;
+}
+.join-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+.join-btn:hover::before {
+  transform: translateX(100%);
+}
+.join-btn:hover {
+  border-color: rgba(255,255,255,0.95);
+  box-shadow:
+    0 0 8px rgba(255,255,255,0.3),
+    0 0 20px rgba(255,255,255,0.15),
+    inset 0 0 8px rgba(255,255,255,0.05);
+}
+/* discord icon svg inline */
+.join-btn svg {
+  width: 13px; height: 13px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+/* corner decorations on button */
+.join-btn .corner {
+  position: absolute;
+  width: 5px; height: 5px;
+  border-color: #fff;
+  border-style: solid;
+  opacity: 0.7;
+}
+.join-btn .corner.tl { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+.join-btn .corner.tr { top: -1px; right: -1px; border-width: 1px 1px 0 0; }
+.join-btn .corner.bl { bottom: -1px; left: -1px; border-width: 0 0 1px 1px; }
+.join-btn .corner.br { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+
+/* ══════════════════════════════
+   SCANLINES & VIGNETTE
+══════════════════════════════ */
+
+/* ══════════════════════════════
+   TITLE ROW (username + badges inline)
+══════════════════════════════ */
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ══════════════════════════════
+   BADGES — inline, minimalist, guns.lol vibe
+══════════════════════════════ */
+.badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: all;
+  /* subtle vertical divider effect on the left (separator from name) */
+  padding-left: 6px;
+  position: relative;
+}
+.badges::before {
+  content: '';
+  position: absolute;
+  left: -9px;
+  top: 50%;
+  width: 1px; height: 24px;
+  transform: translateY(-50%);
+  background: linear-gradient(to bottom,
+    transparent,
+    rgba(255,255,255,0.55),
+    transparent);
+}
+
+.badge {
+  position: relative;
+  width: 36px; height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: none;
+  outline: none;
+  border-radius: 9px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.25);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.35) inset,
+    0 3px 10px rgba(0,0,0,0.45);
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1),
+              background 0.25s ease,
+              border-color 0.25s ease,
+              box-shadow 0.25s ease;
+}
+
+.badge svg,
+.badge .badge-img {
+  width: 20px; height: 20px;
+  overflow: visible;
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1),
+              filter 0.3s ease;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.badge svg {
+  stroke: #ffffff;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  filter:
+    drop-shadow(0 0 2.5px rgba(255,255,255,0.65))
+    drop-shadow(0 0 6px rgba(255,255,255,0.35));
+}
+
+/* PNG-based icons: invert black silhouette to pure white + same neon glow */
+.badge .badge-img {
+  object-fit: contain;
+  /* brightness(0) makes it pure black, invert(1) flips to pure white */
+  filter:
+    brightness(0) invert(1)
+    drop-shadow(0 0 2px rgba(255,255,255,0.6))
+    drop-shadow(0 0 5px rgba(255,255,255,0.3));
+}
+
+/* idle breathing pulse — both SVG and PNG */
+.badge svg,
+.badge .badge-img {
+  animation: badge-breathe 4s ease-in-out infinite;
+}
+.badge:nth-child(2) svg,
+.badge:nth-child(2) .badge-img { animation-delay: 0.5s; }
+.badge:nth-child(3) svg,
+.badge:nth-child(3) .badge-img { animation-delay: 1.0s; }
+.badge:nth-child(4) svg,
+.badge:nth-child(4) .badge-img { animation-delay: 1.5s; }
+
+@keyframes badge-breathe {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 2px rgba(255,255,255,0.6))
+      drop-shadow(0 0 5px rgba(255,255,255,0.3));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 3px rgba(255,255,255,0.95))
+      drop-shadow(0 0 9px rgba(255,255,255,0.5));
+  }
+}
+/* PNG needs separate breathe that keeps the invert() filter active */
+@keyframes badge-breathe-img {
+  0%, 100% {
+    filter:
+      brightness(0) invert(1)
+      drop-shadow(0 0 2px rgba(255,255,255,0.6))
+      drop-shadow(0 0 5px rgba(255,255,255,0.3));
+  }
+  50% {
+    filter:
+      brightness(0) invert(1)
+      drop-shadow(0 0 3px rgba(255,255,255,0.95))
+      drop-shadow(0 0 9px rgba(255,255,255,0.5));
+  }
+}
+.badge .badge-img {
+  animation-name: badge-breathe-img;
+}
+
+.badge:hover,
+.badge:focus-visible {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.95);
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.35) inset,
+    0 0 12px rgba(255,255,255,0.4),
+    0 0 28px rgba(255,255,255,0.2),
+    0 6px 16px rgba(0,0,0,0.55);
+}
+.badge:hover svg,
+.badge:focus-visible svg {
+  transform: scale(1.18);
+  filter:
+    drop-shadow(0 0 3px #fff)
+    drop-shadow(0 0 10px rgba(255,255,255,0.95))
+    drop-shadow(0 0 22px rgba(255,255,255,0.55));
+  animation: none;
+}
+.badge:hover .badge-img,
+.badge:focus-visible .badge-img {
+  transform: scale(1.18);
+  filter:
+    brightness(0) invert(1)
+    drop-shadow(0 0 3px #fff)
+    drop-shadow(0 0 10px rgba(255,255,255,0.95))
+    drop-shadow(0 0 22px rgba(255,255,255,0.55));
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge svg { animation: none; }
+  .badge { transition: none; }
+}
+
+/* ── tooltip (typewriter) ── */
+.badge-tip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px) scale(0.96);
+  padding: 7px 13px;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: rgba(0,0,0,0.88);
+  border: 1px solid rgba(255,255,255,0.28);
+  color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  text-shadow: 0 0 4px rgba(255,255,255,0.7), 0 0 10px rgba(255,255,255,0.3);
+  box-shadow: 0 0 10px rgba(255,255,255,0.18);
+  z-index: 30;
+}
+.badge-tip::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border: 4px solid transparent;
+  border-top-color: rgba(0,0,0,0.88);
+}
+.badge:hover .badge-tip,
+.badge:focus-visible .badge-tip,
+.social:hover .badge-tip,
+.social:focus-visible .badge-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.badge-tip-text { display: inline-block; }
+.badge-tip-caret {
+  display: inline-block;
+  margin-left: 2px;
+  width: 0.5ch;
+  color: rgba(255,255,255,0.85);
+  animation: caret-blink 0.85s steps(2) infinite;
+}
+@keyframes caret-blink { 50% { opacity: 0; } }
+
+/* ══════════════════════════════
+   PROFILE CARD (guns.lol-style)
+══════════════════════════════ */
+.profile-card {
+  position: relative;
+  width: min(92vw, 620px);
+  padding: 26px 28px 22px;
+  background: rgba(10, 10, 14, 0.55);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  backdrop-filter: blur(22px) saturate(130%);
+  -webkit-backdrop-filter: blur(22px) saturate(130%);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.4) inset,
+    0 20px 60px rgba(0,0,0,0.5),
+    0 0 40px rgba(255,255,255,0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  pointer-events: all;
+  /* rigid 3D slab: tilts as one piece inside the .intro-text perspective stage */
+  transform-style: flat;
+  backface-visibility: hidden;
+  will-change: transform, box-shadow;
+}
+
+/* dynamic cursor-follow glare that rides the tilt (set from JS) */
+/* ── dynamic glass-reflection layer ──
+   A soft, moving "specular" highlight that follows the cursor across the
+   card surface. The light direction also shifts with the tilt (set via JS
+   on --light-x / --light-y), so the whole card feels like a physical glass
+   slab catching ambient light. */
+.profile-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    /* hot spot that tracks the cursor */
+    radial-gradient(
+      240px 200px at var(--glare-x, 50%) var(--glare-y, 50%),
+      rgba(255,255,255,0.26),
+      rgba(255,255,255,0.08) 35%,
+      rgba(255,255,255,0) 70%),
+    /* broader directional sheen driven by tilt */
+    linear-gradient(
+      var(--light-angle, 135deg),
+      rgba(255,255,255,0.10) 0%,
+      rgba(255,255,255,0.02) 40%,
+      rgba(255,255,255,0) 70%);
+  opacity: 0.35;
+  transition: opacity 0.35s ease;
+  mix-blend-mode: screen;
+  z-index: 5;
+}
+.profile-card.tilt-active::after { opacity: 1; }
+
+/* dynamic glass-bevel rim — each edge lights up independently based on
+   the card tilt. The side facing the viewer most catches the brightest
+   highlight, so the bevel naturally "chases" the light as the card moves. */
+.profile-card > .card-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 4;
+  box-shadow:
+    /* top */    inset 0  1px 0 rgba(255,255,255, var(--rim-top,    0.10)),
+    /* bottom */ inset 0 -1px 0 rgba(255,255,255, var(--rim-bottom, 0.05)),
+    /* left  */  inset  1px 0 0 rgba(255,255,255, var(--rim-left,   0.08)),
+    /* right */  inset -1px 0 0 rgba(255,255,255, var(--rim-right,  0.08)),
+    /* ambient inner glow */
+    inset 0 0 32px rgba(255,255,255,0.025);
+  opacity: 1;
+  transition: box-shadow 0.08s linear;
+}
+
+/* honour user preference */
+@media (prefers-reduced-motion: reduce) {
+  .profile-card { transform: none !important; }
+}
+
+/* subtle sheen on top edge */
+.profile-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255,255,255,0.4),
+    transparent);
+  pointer-events: none;
+}
+
+/* ── HEADER: avatar + identity ── */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.profile-avatar {
+  position: relative;
+  width: 72px; height: 72px;
+  flex-shrink: 0;
+  /* NO overflow:hidden — the Nitro avatar-decoration is 150% size
+     and needs to extend BEYOND the avatar circle. The circular
+     clipping is done on .avatar-inner / .avatar-img instead. */
+}
+/* clipped circle holder — keeps the avatar image perfectly round
+   without swallowing the decoration overlay */
+.profile-avatar .avatar-clip {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at 30% 30%,
+    rgba(255,255,255,0.12),
+    rgba(255,255,255,0.02));
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.2),
+    inset 0 0 20px rgba(0,0,0,0.5),
+    0 0 12px rgba(255,255,255,0.15);
+}
+.avatar-ring {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3);
+  pointer-events: none;
+  animation: ring-rotate 12s linear infinite;
+}
+.avatar-ring::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 50%;
+  width: 6px; height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 8px #fff, 0 0 16px rgba(255,255,255,0.6);
+}
+@keyframes ring-rotate {
+  to { transform: rotate(360deg); }
+}
+.avatar-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+  user-select: none;
+  letter-spacing: 0;
+}
+.avatar-inner img,
+.avatar-img {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  border-radius: 50%;
+}
+.avatar-img.loaded { opacity: 1; }
+.avatar-fallback {
+  transition: opacity 0.35s ease;
+}
+/* hide the placeholder letter once the real avatar is in */
+.profile-avatar.has-avatar .avatar-fallback { opacity: 0; }
+
+/* Discord Nitro avatar decoration (animated APNG ring overlay)
+   sized at 1.5x the avatar per Discord spec */
+.avatar-decoration {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 150%; height: 150%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  /* subtle glow so the decoration feels integrated with the card */
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.25));
+}
+.avatar-decoration.loaded { opacity: 1; }
+
+.profile-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+.identity-name-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.profile-name {
+  margin: 0;
+  font-size: clamp(1.25rem, 2vw, 1.6rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(255,255,255,0.25);
+  line-height: 1.1;
+}
+.profile-role,
+.profile-meta {
+  /* start hidden — revealed once all widgets have finished loading */
+  opacity: 0;
+  transform: translateY(6px);
+  filter: blur(4px);
+  transition:
+    opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1),
+    filter 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.profile-role.revealed,
+.profile-meta.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+.profile-meta.revealed { transition-delay: 0.15s; }
+
+/* ══════════════════════════════
+   CREDITS LINE (owned by / engineered by)
+   Terminal-styled, always-animated. The whole line keeps "breathing"
+   via a periodic scan-sheen and a blinking // caret separator.
+   ══════════════════════════════ */
+.profile-role {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  margin-top: 4px;
+  padding: 5px 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 7px;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,0.04),
+    rgba(255,255,255,0.01));
+  box-shadow: inset 0 0 20px rgba(255,255,255,0.015);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* scan-sheen: a thin diagonal bright band sweeps across the whole role
+   line every ~6 seconds — keeps the UI alive without being distracting */
+.profile-role::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: -40%;
+  width: 30%;
+  background: linear-gradient(
+    100deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.10) 45%,
+    rgba(255,255,255,0.18) 50%,
+    rgba(255,255,255,0.10) 55%,
+    rgba(255,255,255,0) 100%);
+  transform: skewX(-18deg);
+  pointer-events: none;
+  z-index: 0;
+}
+.profile-role.revealed::before {
+  animation: role-scan 6.5s cubic-bezier(0.6, 0, 0.4, 1) 1.2s infinite;
+}
+@keyframes role-scan {
+  0%   { left: -40%;  opacity: 0; }
+  8%   { opacity: 1; }
+  40%  { left: 140%; opacity: 1; }
+  42%  { opacity: 0; }
+  100% { left: 140%; opacity: 0; }
+}
+
+.profile-role > * { position: relative; z-index: 1; }
+
+.profile-role .credit {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+}
+.profile-role .credit-label {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.62);
+  text-shadow: 0 0 8px rgba(255,255,255,0.08);
+}
+.profile-role .credit-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.2px;
+  position: relative;
+  /* continuous gentle glow breath */
+  animation: name-breath 3.4s ease-in-out infinite;
+}
+.profile-role .credit:nth-child(3) .credit-name {
+  animation-delay: 1.7s;   /* offset so the two names breathe out-of-phase */
+}
+@keyframes name-breath {
+  0%, 100% {
+    text-shadow:
+      0 0 6px  rgba(255,255,255,0.22),
+      0 0 1px  rgba(255,255,255,0.5);
+  }
+  50% {
+    text-shadow:
+      0 0 18px rgba(255,255,255,0.55),
+      0 0 2px  rgba(255,255,255,0.7),
+      0 0 30px rgba(255,255,255,0.18);
+  }
+}
+.profile-role .credit-name::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -3px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255,255,255,0.55),
+    transparent);
+  opacity: 0;
+  transform: scaleX(0.4);
+  transform-origin: center;
+  transition:
+    opacity 0.3s ease,
+    transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.profile-role .credit:hover .credit-name::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* blinking // separator like a terminal caret */
+.profile-role .credit-sep {
+  color: rgba(255,255,255,0.55);
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 1px;
+  user-select: none;
+  animation: sep-blink 1.2s steps(2, end) infinite;
+}
+@keyframes sep-blink {
+  0%, 55%  { opacity: 1;   text-shadow: 0 0 8px rgba(255,255,255,0.35); }
+  60%, 100%{ opacity: 0.25; text-shadow: none; }
+}
+
+/* ── META LINE (hollowdespair.com · est. 2026) ── */
+.profile-meta {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 6px;
+  color: rgba(255,255,255,0.62);
+  position: relative;
+  display: inline-block;
+  padding-left: 14px;
+}
+.profile-meta::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #43b581;
+  box-shadow: 0 0 8px rgba(67,181,129,0.8);
+  transform: translateY(-50%);
+  animation: meta-dot 1.8s ease-in-out infinite;
+}
+@keyframes meta-dot {
+  0%, 100% { opacity: 1;   transform: translateY(-50%) scale(1);   }
+  50%      { opacity: 0.4; transform: translateY(-50%) scale(0.75);}
+}
+
+/* on first reveal, briefly super-glow both names */
+.profile-role.revealed .credit-name {
+  animation:
+    name-breath 3.4s ease-in-out infinite,
+    credit-pulse 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.25s 1 both;
+}
+.profile-role.revealed .credit:nth-child(3) .credit-name {
+  animation-delay: 1.7s, 0.5s;
+}
+@keyframes credit-pulse {
+  0%   { filter: brightness(1);   }
+  25%  { filter: brightness(1.45) drop-shadow(0 0 12px rgba(255,255,255,0.7)); }
+  100% { filter: brightness(1);   }
+}
+
+/* ── WIDGETS (Discord presence + server) ── */
+.profile-widgets {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.widget {
+  position: relative;
+  padding: 12px 14px;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 62px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 2px 10px rgba(0,0,0,0.25);
+  transition: border-color 0.35s ease, background 0.35s ease, transform 0.35s ease;
+}
+.widget::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    140% 120% at 0% 0%,
+    rgba(255,255,255,0.05),
+    transparent 55%);
+}
+
+/* ── DISCORD PRESENCE (Lanyard live data) ── */
+.widget-presence {
+  position: relative;
+  overflow: hidden;
+  min-height: 66px;
+  padding: 12px 14px;
+  transition: border-color 0.5s ease, background 0.5s ease, transform 0.35s ease;
+}
+.widget-presence:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,0.18);
+}
+
+.presence-avatar {
+  position: relative;
+  width: 44px; height: 44px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: visible;
+}
+.presence-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  display: block;
+  transition: border-radius 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.12),
+    0 2px 6px rgba(0,0,0,0.4);
+}
+/* placeholder shimmer until first image loads */
+.presence-avatar img:not([src]),
+.presence-avatar img[src=""] {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.12),
+    rgba(255,255,255,0.05)
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+.presence-status-dot {
+  position: absolute;
+  bottom: -2px; right: -2px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(10, 10, 14, 0.98);
+  background: #747f8d;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+  z-index: 2;
+}
+.presence-status-dot[data-status="online"]  { background: #43b581; box-shadow: 0 0 8px rgba(67,181,129,0.8); }
+.presence-status-dot[data-status="idle"]    { background: #faa61a; box-shadow: 0 0 8px rgba(250,166,26,0.7); }
+.presence-status-dot[data-status="dnd"]     { background: #f04747; box-shadow: 0 0 8px rgba(240,71,71,0.7); }
+.presence-status-dot[data-status="offline"] { background: #747f8d; box-shadow: none; }
+
+.presence-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+/* activity type tag (e.g. "LISTENING", "PLAYING", "CUSTOM STATUS") */
+.presence-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  padding: 2px 7px;
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.78);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 4px;
+  line-height: 1;
+  transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+}
+.presence-tag::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 5px currentColor;
+}
+.presence-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0.15px;
+  line-height: 1.25;
+}
+.presence-sub {
+  font-size: 0.62rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.55);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0.4px;
+  line-height: 1.3;
+}
+
+/* Spotify mode: green accent + round spinning album art + progress bar */
+.widget-presence.is-spotify {
+  background: linear-gradient(135deg,
+    rgba(30, 215, 96, 0.12),
+    rgba(30, 215, 96, 0.02) 60%);
+  border-color: rgba(30, 215, 96, 0.35);
+}
+.widget-presence.is-spotify .presence-avatar img {
+  border-radius: 50%;
+  animation: vinyl-spin 6s linear infinite;
+  box-shadow:
+    inset 0 0 0 2px rgba(0,0,0,0.4),
+    0 0 0 2px rgba(30, 215, 96, 0.5),
+    0 0 14px rgba(30, 215, 96, 0.4);
+}
+.widget-presence.is-spotify .presence-status-dot {
+  background: #1ed760;
+  box-shadow: 0 0 10px rgba(30, 215, 96, 0.9);
+}
+.widget-presence.is-spotify .presence-tag {
+  color: #1ed760;
+  background: rgba(30, 215, 96, 0.12);
+  border-color: rgba(30, 215, 96, 0.35);
+}
+@keyframes vinyl-spin {
+  to { transform: rotate(360deg); }
+}
+
+.presence-progress {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.presence-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #1ed760, #1db954);
+  box-shadow: 0 0 6px rgba(30, 215, 96, 0.6);
+  transition: width 1s linear;
+}
+
+/* game/activity mode: blurple accent */
+.widget-presence.is-playing {
+  border-color: rgba(88, 101, 242, 0.35);
+  background: linear-gradient(135deg,
+    rgba(88, 101, 242, 0.12),
+    rgba(88, 101, 242, 0.02) 60%);
+}
+.widget-presence.is-playing .presence-status-dot {
+  box-shadow: 0 0 8px rgba(88, 101, 242, 0.6);
+}
+.widget-presence.is-playing .presence-tag {
+  color: #8c9eff;
+  background: rgba(88, 101, 242, 0.15);
+  border-color: rgba(88, 101, 242, 0.4);
+}
+
+/* custom status mode: soft white accent */
+.widget-presence.is-custom .presence-tag {
+  color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.15);
+}
+
+/* disconnected / error state */
+.widget-presence[data-state="error"] { opacity: 0.7; }
+.widget-presence[data-state="error"] .presence-title { color: rgba(255,255,255,0.6); }
+
+.widget-body {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.widget-title {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.88);
+  letter-spacing: 0.2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.widget-sub {
+  font-size: 0.58rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.5px;
+}
+/* loading dots */
+.loading-dots::after {
+  content: '';
+  animation: dots 1.4s steps(4, end) infinite;
+}
+@keyframes dots {
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
+  100% { content: ''; }
+}
+
+/* server widget */
+.widget-server {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  min-height: 68px;
+}
+.widget-server-icon {
+  flex-shrink: 0;
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #5865f2, #404eed);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    0 2px 8px rgba(88,101,242,0.35);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+.widget-server-icon svg {
+  width: 22px; height: 22px;
+  fill: #fff;
+}
+.widget-server-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.widget-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(255,255,255,0.15);
+}
+.widget-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.6);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+.widget-stats b {
+  color: rgba(255,255,255,0.92);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.stat-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+.stat-dot.green {
+  background: #43b581;
+  box-shadow: 0 0 6px rgba(67,181,129,0.7);
+  animation: status-pulse 1.8s ease-in-out infinite;
+}
+.stat-dot.gray  { background: rgba(255,255,255,0.35); }
+
+.widget-join {
+  position: relative;
+  flex-shrink: 0;
+  padding: 7px 16px;
+  font-family: inherit;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg,
+    rgba(67, 181, 129, 0.28),
+    rgba(67, 181, 129, 0.14));
+  border: 1px solid rgba(67, 181, 129, 0.55);
+  border-radius: 7px;
+  cursor: none;
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1),
+              background 0.25s ease,
+              border-color 0.25s ease,
+              box-shadow 0.25s ease;
+  text-shadow: 0 0 6px rgba(67,181,129,0.5);
+}
+.widget-join:hover {
+  background: linear-gradient(135deg,
+    rgba(67, 181, 129, 0.45),
+    rgba(67, 181, 129, 0.28));
+  border-color: rgba(67, 181, 129, 1);
+  box-shadow:
+    0 0 14px rgba(67,181,129,0.55),
+    0 0 28px rgba(67,181,129,0.25);
+  transform: translateY(-1px);
+}
+
+/* ── SOCIAL ICONS ROW ── */
+.profile-socials {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.social {
+  position: relative;
+  width: 34px; height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: #fff;
+  text-decoration: none;
+  cursor: none;
+  transition: all 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.social svg {
+  width: 15px; height: 15px;
+  fill: #fff;
+  transition: transform 0.25s ease, filter 0.25s ease;
+  filter: drop-shadow(0 0 2px rgba(255,255,255,0.4));
+}
+.social:hover {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.9);
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 10px rgba(255,255,255,0.3),
+    0 4px 12px rgba(0,0,0,0.4);
+}
+.social:hover svg {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.9));
+}
+
+/* social tooltip (same typewriter system as badges) */
+.social .badge-tip {
+  bottom: calc(100% + 8px);
+}
+
+/* ── FOOTER: views + live clock ── */
+.profile-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  margin-top: 4px;
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.5px;
+}
+.profile-views {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.profile-views svg {
+  width: 13px; height: 13px;
+  stroke: rgba(255,255,255,0.55);
+  stroke-width: 1.6;
+  fill: none;
+}
+.profile-views-label {
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+.profile-views-count {
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 6px rgba(255,255,255,0.15);
+}
+.profile-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.6rem;
+  letter-spacing: 0.5px;
+}
+.profile-status::before {
+  content: '';
+  display: inline-block;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #43b581;
+  box-shadow: 0 0 6px rgba(67,181,129,0.7);
+  animation: status-pulse 1.6s ease-in-out infinite;
+}
+.profile-clock {
+  font-variant-numeric: tabular-nums;
+  color: rgba(255,255,255,0.8);
+  font-weight: 500;
+  letter-spacing: 0.8px;
+}
+.profile-clock-label {
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+/* ── bottom-right watermark (replaces old join-btn spot) ── */
+.profile-watermark {
+  position: fixed;
+  bottom: 16px; right: 20px;
+  z-index: 40;
+  font-size: 0.6rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 1px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.profile-watermark.show { opacity: 1; }
+
+/* ── visitor IP readout (sits inside the profile-footer, left side,
+   mirroring the IST clock on the right). Only the visitor themselves
+   ever sees their own IP — it's fetched entirely client-side. */
+.visitor-ip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.6rem;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.55);
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.visitor-ip.show { opacity: 1; }
+.visitor-ip::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #43b581;
+  box-shadow: 0 0 6px rgba(67,181,129,0.7);
+  animation: ip-dot 1.6s ease-in-out infinite;
+}
+@keyframes ip-dot {
+  0%, 100% { opacity: 1;   transform: scale(1);   }
+  50%      { opacity: 0.35; transform: scale(0.75); }
+}
+.visitor-ip .ip-label {
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+.visitor-ip .ip-value {
+  color: rgba(255,255,255,0.85);
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 6px rgba(255,255,255,0.15);
+}
+.visitor-ip .ip-value.typing::after {
+  content: '_';
+  margin-left: 2px;
+  color: rgba(255,255,255,0.8);
+  animation: ip-caret 0.7s steps(2, end) infinite;
+}
+@keyframes ip-caret {
+  0%, 50%   { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* adjust intro-text container for the card layout */
+.intro-text {
+  gap: 0;
+}
+
+/* ── BADGE CONTAINER (pill box around all 4 badges) ── */
+.identity-name-row .badges {
+  padding: 5px 8px;
+  gap: 4px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 9px;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,0.3),
+    0 2px 8px rgba(0,0,0,0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.35s ease, border-color 0.35s ease;
+}
+.identity-name-row .badges:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.2);
+}
+/* remove the vertical divider — the box itself is the separator now */
+.identity-name-row .badges::before { display: none; }
+
+/* shrink badges inside the pill box */
+.identity-name-row .badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  /* inside the container: no own background/border, just icons */
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.identity-name-row .badge svg,
+.identity-name-row .badge .badge-img {
+  width: 14px;
+  height: 14px;
+}
+
+/* ── SMOOTH BADGE HOVER (no jump — graceful scale + glow) ── */
+.identity-name-row .badge {
+  transition:
+    background 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    border-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.identity-name-row .badge svg,
+.identity-name-row .badge .badge-img {
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.2, 0.4, 1),
+    filter 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.identity-name-row .badge:hover,
+.identity-name-row .badge:focus-visible {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.35);
+  transform: none;
+  box-shadow:
+    0 0 10px rgba(255,255,255,0.18),
+    inset 0 0 8px rgba(255,255,255,0.06);
+}
+.identity-name-row .badge:hover svg,
+.identity-name-row .badge:focus-visible svg {
+  transform: scale(1.12);
+  filter:
+    drop-shadow(0 0 2px #fff)
+    drop-shadow(0 0 7px rgba(255,255,255,0.85))
+    drop-shadow(0 0 14px rgba(255,255,255,0.35));
+}
+.identity-name-row .badge:hover .badge-img,
+.identity-name-row .badge:focus-visible .badge-img {
+  transform: scale(1.12);
+  filter:
+    brightness(0) invert(1)
+    drop-shadow(0 0 2px #fff)
+    drop-shadow(0 0 7px rgba(255,255,255,0.85))
+    drop-shadow(0 0 14px rgba(255,255,255,0.35));
+}
+
+/* pull tooltip slightly closer when badges are small */
+.identity-name-row .badge .badge-tip {
+  bottom: calc(100% + 8px);
+}
+</style>
+</head>
+<body>
+
+<!-- CUSTOM CURSOR -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<!-- CLICK TO ENTER -->
+<div id="enter-screen">
+
+  <!-- 4 minimal corner brackets -->
+  <div class="enter-corner tl"></div>
+  <div class="enter-corner tr"></div>
+  <div class="enter-corner bl"></div>
+  <div class="enter-corner br"></div>
+
+  <!-- central content -->
+  <div class="enter-content">
+    <div class="enter-title">@hollowdespair</div>
+    <div class="enter-bar" aria-hidden="true"></div>
+    <div class="enter-label">click to enter</div>
+    <div class="enter-hint">[ tap  ·  enter  ·  space ]</div>
+  </div>
+
+</div>
+
+<!-- FALLBACK BG -->
+<div class="fallback-bg"></div>
+
+<!-- VIDEO -->
+<video id="video" preload="auto" playsinline muted loop>
+  <source src="video.mp4" type="video/mp4">
+</video>
+
+<div class="scanlines" id="scanlines"></div>
+<div class="vignette"  id="vignette"></div>
+
+<!-- EYE OVERLAY -->
+<div class="cinematic-overlay" id="overlay">
+  <div class="eye eye-top"></div>
+  <div class="eye eye-bottom"></div>
+</div>
+
+<!-- VOLUME CONTROL -->
+<div id="volume-control">
+  <!-- speaker icon -->
+  <svg class="vol-icon" id="vol-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path id="vol-path" d="M11 5L6 9H2v6h4l5 4V5z" fill="white" opacity="0.85"/>
+    <path id="vol-wave1" d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.85"/>
+    <path id="vol-wave2" d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/>
+  </svg>
+  <input type="range" id="volume-slider" min="0" max="100" value="100">
+</div>
+
+<!-- CENTER PROFILE CARD -->
+<div class="intro-text" id="text">
+  <div class="profile-card">
+
+    <!-- glass rim highlight overlay (sits on top of everything for the lip shine) -->
+    <div class="card-rim" aria-hidden="true"></div>
+
+    <!-- HEADER: avatar + identity -->
+    <div class="profile-header">
+      <div class="profile-avatar has-avatar" id="profile-avatar">
+        <div class="avatar-clip">
+          <div class="avatar-ring"></div>
+          <div class="avatar-inner">
+            <span class="avatar-fallback" id="avatar-fallback">H</span>
+            <img
+              class="avatar-img loaded"
+              id="profile-avatar-img"
+              src="assets/avatar.png"
+              alt=""
+              draggable="false"
+              onload="this.classList.add('loaded')">
+          </div>
+        </div>
+        <img class="avatar-decoration" id="profile-avatar-decoration" alt="" draggable="false" hidden>
+      </div>
+
+      <div class="profile-identity">
+        <div class="identity-name-row">
+          <h1 class="profile-name" id="profile-name">$hollow</h1>
+
+          <div class="badges" id="badges" aria-label="badges">
+            <!-- 1 · Throne — "1 𝔬𝔣 1" -->
+            <span class="badge" tabindex="0" data-tip="1 𝔬𝔣 1" aria-label="1 of 1">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 9l2.2 7.2a1 1 0 0 0 .96.72h11.68a1 1 0 0 0 .96-.72L21 9l-4.2 3L12 5 7.2 12 3 9z"/>
+                <path d="M5.8 20h12.4"/>
+                <circle cx="3" cy="8" r="1.1"/>
+                <circle cx="21" cy="8" r="1.1"/>
+                <circle cx="12" cy="4" r="1.1"/>
+              </svg>
+              <span class="badge-tip"><span class="badge-tip-text"></span><span class="badge-tip-caret">_</span></span>
+            </span>
+
+            <!-- 2 · Crown — "Hollow" -->
+            <span class="badge" tabindex="0" data-tip="Kayra" aria-label="Kayra">
+              <img class="badge-img" src="assets/badges/crown.png" alt="" draggable="false">
+              <span class="badge-tip"><span class="badge-tip-text"></span><span class="badge-tip-caret">_</span></span>
+            </span>
+
+            <!-- 3 · Developer — "ErAy" -->
+            <span class="badge" tabindex="0" data-tip="ErAy" aria-label="ErAy">
+              <img class="badge-img" src="assets/badges/developer.png" alt="" draggable="false">
+              <span class="badge-tip"><span class="badge-tip-text"></span><span class="badge-tip-caret">_</span></span>
+            </span>
+
+            <!-- 4 · Verified — "Verified" -->
+            <span class="badge" tabindex="0" data-tip="Verified" aria-label="Verified">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/>
+                <path d="m9 12 2 2 4-4"/>
+              </svg>
+              <span class="badge-tip"><span class="badge-tip-text"></span><span class="badge-tip-caret">_</span></span>
+            </span>
+          </div>
+        </div>
+
+        <div class="profile-role">
+          <span class="credit">
+            <span class="credit-label">owned by</span>
+            <span class="credit-name">@hollowdespair</span>
+          </span>
+          <span class="credit-sep" aria-hidden="true">//</span>
+          <span class="credit">
+            <span class="credit-label">engineered by</span>
+            <span class="credit-name">Kayra & ErAy</span>
+          </span>
+        </div>
+        <div class="profile-meta">itsnotkayra.com &nbsp;·&nbsp; est. 2026</div>
+      </div>
+    </div>
+
+    <!-- WIDGETS: discord presence + server -->
+    <div class="profile-widgets">
+
+      <div class="widget widget-presence" id="presence-widget" data-state="loading">
+        <div class="presence-avatar">
+          <img id="presence-avatar-img" alt="" draggable="false">
+          <span class="presence-status-dot" id="presence-status-dot" data-status="offline"></span>
+        </div>
+        <div class="presence-body">
+          <span class="presence-tag" id="presence-tag" hidden></span>
+          <div class="presence-title" id="presence-title">Connecting<span class="loading-dots"></span></div>
+          <div class="presence-sub"   id="presence-sub">Lanyard WebSocket</div>
+        </div>
+        <div class="presence-progress" id="presence-progress" hidden>
+          <div class="presence-progress-bar" id="presence-progress-bar"></div>
+        </div>
+      </div>
+
+      <div class="widget widget-server">
+        <div class="widget-server-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+          </svg>
+        </div>
+        <div class="widget-server-body">
+          <div class="widget-label">SANALORTAM</div>
+          <div class="widget-stats">
+            <span><span class="stat-dot green"></span><b id="server-online">—</b> Online</span>
+            <span><span class="stat-dot gray"></span><b id="server-members">—</b> Members</span>
+          </div>
+        </div>
+        <a class="widget-join" href="https://discord.gg/sanalortam" target="_blank" rel="noopener">Join</a>
+      </div>
+    </div>
+
+    <!-- FOOTER: visitor IP (left)  ·  live clock (right) -->
+    <div class="profile-footer">
+      <div class="visitor-ip" id="visitor-ip" aria-hidden="true">
+        <span class="ip-label">your ip</span>
+        <span class="ip-value" id="visitor-ip-value">—</span>
+      </div>
+      <div class="profile-status">
+        <span class="profile-clock-label">IST</span>
+        <span class="profile-clock" id="profile-clock">--:--:--</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- bottom-right watermark -->
+<div class="profile-watermark" id="watermark">hollowdespair.com</div>
+
+<script>
+(function () {
+  const enterScreen  = document.getElementById('enter-screen');
+  const video        = document.getElementById('video');
+  const overlay      = document.getElementById('overlay');
+  const text         = document.getElementById('text');
+  const scanlines    = document.getElementById('scanlines');
+  const vignette     = document.getElementById('vignette');
+  const volControl   = document.getElementById('volume-control');
+  const volSlider    = document.getElementById('volume-slider');
+  const volWave1     = document.getElementById('vol-wave1');
+  const volWave2     = document.getElementById('vol-wave2');
+  const cursorDot    = document.getElementById('cursor-dot');
+  const cursorRing   = document.getElementById('cursor-ring');
+
+  /* ── CURSOR ── */
+  let mx = -100, my = -100;
+  let rx = -100, ry = -100;
+  let lastTrailX = -9999, lastTrailY = -9999;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursorDot.style.left = mx + 'px';
+    cursorDot.style.top  = my + 'px';
+
+    // throttle trail — only emit after ~10px of movement
+    // (identical look, but ~3-4x less DOM churn than before)
+    const dx = mx - lastTrailX, dy = my - lastTrailY;
+    if (dx*dx + dy*dy < 100) return;
+    lastTrailX = mx; lastTrailY = my;
+
+    const p = document.createElement('div');
+    p.className = 'trail-particle';
+    p.style.left = mx + 'px';
+    p.style.top  = my + 'px';
+    const size = Math.random() * 4 + 2;
+    p.style.width  = size + 'px';
+    p.style.height = size + 'px';
+    p.style.background = `rgba(255,255,255,${Math.random() * 0.4 + 0.1})`;
+    p.style.boxShadow = '0 0 4px #fff, 0 0 8px rgba(255,255,255,0.5)';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 500);
+  });
+
+  // fade cursor out when it leaves the window, back in on return
+  document.addEventListener('mouseleave', () => document.body.classList.add('cursor-gone'));
+  document.addEventListener('mouseenter', () => document.body.classList.remove('cursor-gone'));
+
+  // click / press feedback
+  document.addEventListener('pointerdown',   () => document.body.classList.add('cursor-pressed'));
+  document.addEventListener('pointerup',     () => document.body.classList.remove('cursor-pressed'));
+  document.addEventListener('pointercancel', () => document.body.classList.remove('cursor-pressed'));
+
+  // ring lags behind slightly
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    cursorRing.style.left = rx + 'px';
+    cursorRing.style.top  = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // hover effect on interactive elements
+  document.querySelectorAll('a, input, button, .badge, .social, .widget-join, #enter-screen').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+
+  /* ══════════════════════════════
+     3D CARD TILT — perspective follow
+     • max ±7° rotation on X / Y based on cursor position vs. card center
+     • smooth lerp towards target (no jitter)
+     • inner depth layers (.profile-header / .widgets / .footer) move
+       at different Z depths for a true parallax feel
+     • radial glare follows the cursor across the card surface
+  ══════════════════════════════ */
+  const tiltCard = document.querySelector('.profile-card');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (tiltCard && !prefersReducedMotion) {
+    // ── GLOBAL 3D CARD TILT ──
+    // The card tracks the cursor ANYWHERE on screen:
+    //   cursor LEFT  of card center → card leans LEFT  (left edge forward)
+    //   cursor RIGHT of card center → card leans RIGHT (right edge forward)
+    //   cursor ABOVE card center    → card leans UP    (top edge forward)
+    //   cursor BELOW card center    → card leans DOWN  (bottom edge forward)
+    // It's "attractive" — the card looks like it's facing the cursor.
+    const MAX_DEG = 18;         // peak tilt angle
+    const EASE    = 0.12;       // lerp speed (lower = smoother, laggier)
+    const RANGE_X = 700;        // px of horizontal cursor distance = max tilt
+    const RANGE_Y = 500;        // px of vertical cursor distance = max tilt
+
+    let tx = 0, ty = 0;         // target rotation
+    let cx = 0, cy = 0;         // current (eased)
+    let mouseX = -9999, mouseY = -9999;
+    let hasMouse = false;
+
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      hasMouse = true;
+    }, { passive: true });
+
+    document.addEventListener('mouseleave', () => { hasMouse = false; });
+    window.addEventListener('blur',         () => { hasMouse = false; });
+
+    (function tick() {
+      if (hasMouse) {
+        // use the card center as the 3D pivot — tilt is relative to it
+        const rect = tiltCard.getBoundingClientRect();
+        if (rect.width) {
+          const cxCard = rect.left + rect.width  / 2;
+          const cyCard = rect.top  + rect.height / 2;
+          // normalized cursor offset from card center (-1..1, clamped)
+          const nx = clamp((mouseX - cxCard) / RANGE_X, -1, 1);
+          const ny = clamp((mouseY - cyCard) / RANGE_Y, -1, 1);
+
+          // ATTRACT: card face turns TOWARD the cursor.
+          //   mouse right → rotateY negative → right edge comes forward.
+          //   mouse down  → rotateX positive → bottom edge comes forward.
+          ty = -nx * MAX_DEG;
+          tx =  ny * MAX_DEG;
+
+          // glare hotspot = projected cursor position on card surface
+          const gx = clamp((mouseX - rect.left) / rect.width,  0, 1);
+          const gy = clamp((mouseY - rect.top)  / rect.height, 0, 1);
+          tiltCard.style.setProperty('--glare-x', (gx * 100).toFixed(1) + '%');
+          tiltCard.style.setProperty('--glare-y', (gy * 100).toFixed(1) + '%');
+        }
+      } else {
+        tx = 0; ty = 0;
+      }
+
+      cx += (tx - cx) * EASE;
+      cy += (ty - cy) * EASE;
+      if (Math.abs(cx) < 0.01) cx = 0;
+      if (Math.abs(cy) < 0.01) cy = 0;
+
+      // Activate class for CSS glare (always on while cursor is present)
+      if (hasMouse) tiltCard.classList.add('tilt-active');
+      else          tiltCard.classList.remove('tilt-active');
+
+      // Rigid transform — the whole card rotates as one slab.
+      tiltCard.style.transform =
+        `rotateX(${cx.toFixed(2)}deg) rotateY(${cy.toFixed(2)}deg)`;
+
+      // Dynamic directional sheen — the virtual light direction rotates
+      // with the card so the broad sheen naturally sweeps across glass.
+      const lightAngle = 135 - cy * 2.2 + cx * 1.4;
+      tiltCard.style.setProperty('--light-angle', lightAngle.toFixed(1) + 'deg');
+
+      // Dynamic 4-side bevel highlight. In this attractive model:
+      //   cy (rotateY) negative → right edge FORWARD → right rim brighter
+      //   cx (rotateX) positive → bottom edge FORWARD → bottom rim brighter
+      const rimRight  = clamp(-cy / MAX_DEG, 0, 1);
+      const rimLeft   = clamp( cy / MAX_DEG, 0, 1);
+      const rimBottom = clamp( cx / MAX_DEG, 0, 1);
+      const rimTop    = clamp(-cx / MAX_DEG, 0, 1);
+      tiltCard.style.setProperty('--rim-left',   (0.08 + rimLeft   * 0.30).toFixed(3));
+      tiltCard.style.setProperty('--rim-right',  (0.08 + rimRight  * 0.30).toFixed(3));
+      tiltCard.style.setProperty('--rim-top',    (0.10 + rimTop    * 0.28).toFixed(3));
+      tiltCard.style.setProperty('--rim-bottom', (0.05 + rimBottom * 0.22).toFixed(3));
+
+      // Dynamic drop shadow — shadow falls OPPOSITE to the tilt, so
+      // the leaning-forward side is closer to its shadow (grounded),
+      // while the receding side is lifted with more shadow distance.
+      const tiltMag = Math.min(1, (Math.abs(cx) + Math.abs(cy)) / (MAX_DEG * 1.2));
+      const shadowX = ( cy * 2.2).toFixed(1);   // opposite of rotateY
+      const shadowY = (14 - cx * 2.0).toFixed(1);
+      const shadowBlur   = (55 + tiltMag * 45).toFixed(0);
+      const shadowSpread = -(20 + tiltMag * 10).toFixed(0);
+      const shadowAlpha  = (0.55 + tiltMag * 0.20).toFixed(3);
+      tiltCard.style.boxShadow =
+        `${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowSpread}px rgba(0,0,0,${shadowAlpha}),` +
+        ` 0 6px 18px -8px rgba(0,0,0,0.45),` +
+        ` 0 0 0 1px rgba(0,0,0,0.35) inset,` +
+        ` 0 1px 0 rgba(255,255,255,0.08) inset`;
+
+      requestAnimationFrame(tick);
+    })();
+  }
+
+  /* ── VOLUME SLIDER ── */
+  function updateSliderTrack(val) {
+    volSlider.style.setProperty('--val', val + '%');
+    // mute icon states
+    if (val == 0) {
+      volWave1.style.opacity = '0';
+      volWave2.style.opacity = '0';
+    } else if (val < 50) {
+      volWave1.style.opacity = '0.85';
+      volWave2.style.opacity = '0';
+    } else {
+      volWave1.style.opacity = '0.85';
+      volWave2.style.opacity = '0.5';
+    }
+  }
+
+  // fade-in interval handle + "user took control" flag so we don't fight the user
+  let volumeFadeInterval = null;
+  let userTouchedVolume  = false;
+
+  function stopVolumeFade() {
+    if (volumeFadeInterval) {
+      clearInterval(volumeFadeInterval);
+      volumeFadeInterval = null;
+    }
+  }
+
+  volSlider.addEventListener('input', () => {
+    userTouchedVolume = true;
+    stopVolumeFade();
+    const val = parseInt(volSlider.value);
+    video.volume = val / 100;
+    video.muted  = val === 0;
+    updateSliderTrack(val);
+  });
+
+  // also cancel fade the instant the user grabs the slider (before 'input' fires)
+  ['pointerdown', 'mousedown', 'touchstart', 'keydown', 'wheel'].forEach(ev => {
+    volSlider.addEventListener(ev, () => {
+      userTouchedVolume = true;
+      stopVolumeFade();
+    }, { passive: true });
+  });
+
+  /* ── ENTER SEQUENCE ── */
+  video.load();
+
+  // keyboard shortcuts: Enter / Space / any key also triggers entry
+  const keyEnterHandler = (e) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar' || e.code === 'Space') {
+      e.preventDefault();
+      enterScreen.click();
+      document.removeEventListener('keydown', keyEnterHandler);
+    }
+  };
+  document.addEventListener('keydown', keyEnterHandler);
+
+  enterScreen.addEventListener('click', async () => {
+    enterScreen.classList.add('fade-out');
+    setTimeout(() => enterScreen.remove(), 1000);
+
+    video.muted  = false;
+    video.volume = 0;
+
+    try {
+      await video.play();
+    } catch (e) {
+      video.muted = true;
+      await video.play().catch(() => {});
+    }
+
+    video.classList.add('visible');
+
+    setTimeout(() => {
+      scanlines.classList.add('visible');
+      vignette.classList.add('visible');
+    }, 400);
+
+    setTimeout(() => overlay.classList.add('open'), 300);
+    setTimeout(() => text.classList.add('show'), 1200);
+
+    // show volume control
+    setTimeout(() => volControl.classList.add('visible'), 1600);
+
+    // fade volume in — stops instantly if the user grabs the slider
+    setTimeout(() => {
+      if (video.muted || userTouchedVolume) return;
+      stopVolumeFade();
+      volumeFadeInterval = setInterval(() => {
+        if (userTouchedVolume) { stopVolumeFade(); return; }
+        video.volume = Math.min(video.volume + 0.02, 1);
+        const pct = Math.round(video.volume * 100);
+        updateSliderTrack(pct);
+        volSlider.value = pct;
+        if (video.volume >= 1) stopVolumeFade();
+      }, 80);
+    }, 500);
+  }, { once: true });
+
+  /* ── TYPEWRITER TOOLTIP (badges + socials) ── */
+  document.querySelectorAll('.badge, .social').forEach(el => {
+    const tip     = el.dataset.tip || '';
+    const textEl  = el.querySelector('.badge-tip-text');
+    if (!textEl) return;
+
+    let typingTimer = null;
+
+    const type = () => {
+      clearTimeout(typingTimer);
+      let i = 0;
+      textEl.textContent = '';
+      const tick = () => {
+        if (i <= tip.length) {
+          textEl.textContent = tip.slice(0, i);
+          i++;
+          typingTimer = setTimeout(tick, 55);
+        }
+      };
+      tick();
+    };
+
+    const stop = () => clearTimeout(typingTimer);
+
+    el.addEventListener('mouseenter', type);
+    el.addEventListener('focus',      type);
+    el.addEventListener('mouseleave', stop);
+    el.addEventListener('blur',       stop);
+  });
+
+  /* ── ANIMATED VIEW COUNTER ── */
+  const viewEl = document.getElementById('view-count');
+  if (viewEl) {
+    // persist count in localStorage so it grows per page load (demo counter)
+    const KEY = 'hd_views';
+    const stored = parseInt(localStorage.getItem(KEY) || '3210', 10);
+    const next = stored + 1;
+    try { localStorage.setItem(KEY, String(next)); } catch (_) {}
+
+    // count-up animation
+    let current = Math.max(0, next - 87);
+    const target = next;
+    const format = n => n.toLocaleString('en-US');
+    const step = () => {
+      const diff = target - current;
+      if (diff <= 0) { viewEl.textContent = format(target); return; }
+      current += Math.max(1, Math.ceil(diff / 10));
+      viewEl.textContent = format(current);
+      requestAnimationFrame(step);
+    };
+    // delay the counter start until card is visible
+    setTimeout(step, 2000);
+  }
+
+  /* ── WATERMARK fade-in ── */
+  const watermark = document.getElementById('watermark');
+  if (watermark) {
+    setTimeout(() => watermark.classList.add('show'), 2400);
+  }
+
+  /* ── VISITOR IP HUD ──
+     Fetches the visitor's own public IP client-side and types it out in
+     the bottom-left corner. The value only ever lives in the visitor's
+     browser — this is purely a local readout, not something other users
+     will see. */
+  const ipBox   = document.getElementById('visitor-ip');
+  const ipValue = document.getElementById('visitor-ip-value');
+  if (ipBox && ipValue) {
+    // small typewriter helper
+    function typeIp(text) {
+      ipValue.textContent = '';
+      ipValue.classList.add('typing');
+      let i = 0;
+      (function step() {
+        if (i < text.length) {
+          ipValue.textContent += text.charAt(i++);
+          setTimeout(step, 55 + Math.random() * 35);
+        } else {
+          // keep caret for a moment then drop it
+          setTimeout(() => ipValue.classList.remove('typing'), 900);
+        }
+      })();
+    }
+
+    // kick off the fetch after the intro reveal
+    setTimeout(() => {
+      ipBox.classList.add('show');
+      // ipify is a tiny zero-auth endpoint that just returns the caller's IP
+      fetch('https://api.ipify.org?format=json', { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : Promise.reject(r.status))
+        .then(d => typeIp(d.ip || 'unknown'))
+        .catch(() => {
+          // fallback: second endpoint in case ipify is blocked
+          fetch('https://ipv4.icanhazip.com', { cache: 'no-store' })
+            .then(r => r.ok ? r.text() : Promise.reject(r.status))
+            .then(t => typeIp((t || '').trim() || 'unknown'))
+            .catch(() => typeIp('unavailable'));
+        });
+    }, 2600);
+  }
+
+  /* ── LIVE CLOCK (Europe/Istanbul) ── */
+  const clockEl = document.getElementById('profile-clock');
+  if (clockEl) {
+    const fmt = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Istanbul',
+      hour:   '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+    const tickClock = () => { clockEl.textContent = fmt.format(new Date()); };
+    tickClock();
+    setInterval(tickClock, 1000);
+  }
+
+  /* ══════════════════════════════
+     REVEAL ORCHESTRATION
+     • .profile-role + .profile-meta stay hidden until both widgets have loaded
+     • once Lanyard presence AND Discord server stats come in, we add `.revealed`
+     • safety timeout: reveal anyway after 6s even if a data source fails
+  ══════════════════════════════ */
+  const roleEls = document.querySelectorAll('.profile-role, .profile-meta');
+  let presenceReady   = false;
+  let serverStatsReady = false;
+  let widgetsRevealed = false;
+
+  function maybeRevealWidgets() {
+    if (widgetsRevealed) return;
+    if (presenceReady && serverStatsReady) {
+      widgetsRevealed = true;
+      roleEls.forEach(el => el.classList.add('revealed'));
+    }
+  }
+  // safety net — if something never resolves, still reveal
+  setTimeout(() => {
+    if (!widgetsRevealed) {
+      widgetsRevealed = true;
+      roleEls.forEach(el => el.classList.add('revealed'));
+    }
+  }, 6000);
+
+  // expose the readiness setters so the presence / server-stats blocks below
+  // (which live in their own scopes via `if`) can signal progress
+  window.__hdMark = key => {
+    if (key === 'presence')  presenceReady    = true;
+    if (key === 'server')    serverStatsReady = true;
+    maybeRevealWidgets();
+  };
+
+  /* ── DISCORD SERVER LIVE STATS (sanalortam invite) ── */
+  const onlineEl  = document.getElementById('server-online');
+  const membersEl = document.getElementById('server-members');
+  if (onlineEl && membersEl) {
+    const INVITE_CODE = 'sanalortam';
+    const fmtNum = n => (n ?? 0).toLocaleString('en-US');
+
+    async function pullServerStats() {
+      try {
+        const res  = await fetch(
+          `https://discord.com/api/v10/invites/${INVITE_CODE}?with_counts=true&with_expiration=false`,
+          { headers: { 'Accept': 'application/json' } }
+        );
+        if (!res.ok) throw new Error('invite fetch ' + res.status);
+        const json = await res.json();
+        if (json && typeof json.approximate_member_count === 'number') {
+          membersEl.textContent = fmtNum(json.approximate_member_count);
+        }
+        if (json && typeof json.approximate_presence_count === 'number') {
+          onlineEl.textContent = fmtNum(json.approximate_presence_count);
+        }
+      } catch (_) {
+        onlineEl.textContent  = '—';
+        membersEl.textContent = '—';
+      } finally {
+        window.__hdMark('server');  // mark ready whether fetch succeeded or not
+      }
+    }
+    pullServerStats();
+    setInterval(pullServerStats, 60 * 1000);
+  } else {
+    window.__hdMark('server');
+  }
+
+  /* ══════════════════════════════
+     DISCORD PRESENCE — Lanyard WebSocket
+     https://github.com/Phineas/lanyard
+  ══════════════════════════════ */
+  const DISCORD_ID = '676857166363361291';
+
+  const presenceEl    = document.getElementById('presence-widget');
+  const presenceTag   = document.getElementById('presence-tag');
+  const presenceTitle = document.getElementById('presence-title');
+  const presenceSub   = document.getElementById('presence-sub');
+  const presenceDot   = document.getElementById('presence-status-dot');
+  const presenceImg   = document.getElementById('presence-avatar-img');
+  const presenceBar   = document.getElementById('presence-progress');
+  const presenceBarFill = document.getElementById('presence-progress-bar');
+
+  // main profile-card avatar (the big one at the top) + Nitro decoration
+  const profileAvatarEl   = document.getElementById('profile-avatar');
+  const profileAvatarImg  = document.getElementById('profile-avatar-img');
+  const profileDecoration = document.getElementById('profile-avatar-decoration');
+  const profileNameEl     = document.getElementById('profile-name');
+
+  function setPresenceTag(text) {
+    if (!presenceTag) return;
+    if (!text) {
+      presenceTag.hidden = true;
+      presenceTag.textContent = '';
+    } else {
+      presenceTag.hidden = false;
+      presenceTag.textContent = text;
+    }
+  }
+
+  if (presenceEl) {
+    const STATUS_LABEL = {
+      online:  'Online',
+      idle:    'Idle',
+      dnd:     'Do Not Disturb',
+      offline: 'Offline'
+    };
+
+    // https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types
+    const ACT_PLAYING   = 0;
+    const ACT_STREAMING = 1;
+    const ACT_LISTENING = 2;
+    const ACT_WATCHING  = 3;
+    const ACT_CUSTOM    = 4;
+    const ACT_COMPETING = 5;
+
+    let spotifyTimer = null;
+
+    // Lanyard quicklink — https://github.com/Phineas/lanyard#quicklinks
+    //   GET https://api.lanyard.rest/<id>.<png|gif|webp|jpg|jpeg>
+    // Gives us the avatar directly without needing the hash from the API response.
+    const LANYARD_AVATAR = ext => `https://api.lanyard.rest/${DISCORD_ID}.${ext}`;
+
+    function avatarUrl(user) {
+      if (user && user.avatar) {
+        const ext = user.avatar.startsWith('a_') ? 'gif' : 'png';
+        return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}?size=128`;
+      }
+      // fallback: Lanyard quicklink (works without presence data)
+      return LANYARD_AVATAR('png');
+    }
+
+    // preload the presence widget avatar instantly via Lanyard quicklink
+    // (the BIG profile-card avatar is a custom asset — assets/avatar.png — and
+    //  is NOT overridden by Lanyard data, only the decoration ring is synced)
+    presenceImg.src = LANYARD_AVATAR('png');
+
+    // Discord avatar decoration URL (animated APNG for Nitro users)
+    //   https://cdn.discordapp.com/avatar-decoration-presets/{asset}.png?size=240&passthrough=true
+    function decorationUrl(asset) {
+      if (!asset) return null;
+      return `https://cdn.discordapp.com/avatar-decoration-presets/${asset}.png?size=240&passthrough=true`;
+    }
+
+    function applyProfileDecoration(user) {
+      if (!profileDecoration || !user) return;
+      const asset = user.avatar_decoration_data && user.avatar_decoration_data.asset;
+      const url   = decorationUrl(asset);
+      if (url) {
+        if (profileDecoration.dataset.src !== url) {
+          profileDecoration.dataset.src = url;
+          profileDecoration.hidden = false;
+          profileDecoration.classList.remove('loaded');
+          profileDecoration.onload  = () => profileDecoration.classList.add('loaded');
+          profileDecoration.onerror = () => {
+            profileDecoration.hidden = true;
+            profileDecoration.removeAttribute('src');
+          };
+          profileDecoration.src = url;
+        }
+      } else {
+        profileDecoration.hidden = true;
+        profileDecoration.classList.remove('loaded');
+        profileDecoration.removeAttribute('src');
+      }
+    }
+
+    function render(data) {
+      clearInterval(spotifyTimer);
+      spotifyTimer = null;
+
+      if (!data || !data.discord_user) {
+        presenceEl.dataset.state = 'error';
+        setPresenceTag('');
+        presenceTitle.textContent = 'Not tracked by Lanyard';
+        presenceSub.textContent   = 'join discord.gg/lanyard';
+        presenceDot.dataset.status = 'offline';
+        if (window.__hdMark) window.__hdMark('presence');
+        return;
+      }
+
+      presenceEl.dataset.state = 'live';
+      presenceEl.classList.remove('is-spotify', 'is-playing', 'is-custom');
+      presenceBar.hidden = true;
+      presenceBarFill.style.width = '0%';
+      if (window.__hdMark) window.__hdMark('presence');
+
+      const { discord_user, discord_status, activities, listening_to_spotify, spotify } = data;
+      presenceDot.dataset.status = discord_status || 'offline';
+
+      // BIG avatar stays as the custom server-profile image (assets/avatar.png).
+      // We only sync the Nitro decoration ring around it from Discord.
+      applyProfileDecoration(discord_user);
+
+      // Username is intentionally pinned to "$hollow" in the markup and is
+      // NOT overwritten by Discord's global_name — this is the chosen handle.
+
+      // ── SPOTIFY ──
+      if (listening_to_spotify && spotify) {
+        presenceEl.classList.add('is-spotify');
+        setPresenceTag('Listening on Spotify');
+        presenceImg.src = spotify.album_art_url || avatarUrl(discord_user);
+        presenceTitle.textContent = spotify.song || '—';
+        presenceSub.textContent   = `by ${spotify.artist || '—'}`;
+
+        // live progress bar
+        if (spotify.timestamps && spotify.timestamps.start && spotify.timestamps.end) {
+          presenceBar.hidden = false;
+          const start = spotify.timestamps.start;
+          const end   = spotify.timestamps.end;
+          const duration = end - start;
+          const tick = () => {
+            const now = Date.now();
+            const pct = Math.max(0, Math.min(100, ((now - start) / duration) * 100));
+            presenceBarFill.style.width = pct + '%';
+          };
+          tick();
+          spotifyTimer = setInterval(tick, 1000);
+        }
+        return;
+      }
+
+      // ── GAME / ACTIVITY ──
+      const game   = activities && activities.find(a => a.type === ACT_PLAYING);
+      const stream = activities && activities.find(a => a.type === ACT_STREAMING);
+      const watch  = activities && activities.find(a => a.type === ACT_WATCHING);
+      const custom = activities && activities.find(a => a.type === ACT_CUSTOM);
+      const act    = game || stream || watch;
+
+      presenceImg.src = avatarUrl(discord_user);
+
+      if (act) {
+        presenceEl.classList.add('is-playing');
+        const verb = act.type === ACT_STREAMING ? 'Streaming'
+                   : act.type === ACT_WATCHING  ? 'Watching'
+                   : 'Playing';
+        setPresenceTag(verb);
+        presenceTitle.textContent = act.name || '—';
+        presenceSub.textContent   = act.details || act.state || STATUS_LABEL[discord_status] || '';
+        return;
+      }
+
+      if (custom) {
+        presenceEl.classList.add('is-custom');
+        const emoji = custom.emoji
+          ? (custom.emoji.id
+              ? ''    /* skip custom server emojis — need URL not text */
+              : (custom.emoji.name || '') + ' ')
+          : '';
+        const state = custom.state || '';
+        setPresenceTag('Custom Status');
+        presenceTitle.textContent = (emoji + state).trim() || (discord_user.global_name || discord_user.username);
+        presenceSub.textContent   = STATUS_LABEL[discord_status] || 'Offline';
+        return;
+      }
+
+      // plain status
+      setPresenceTag(STATUS_LABEL[discord_status] || 'Offline');
+      presenceTitle.textContent = discord_user.global_name || discord_user.username || 'hollowdespair';
+      presenceSub.textContent   = `@${discord_user.username || 'unknown'}`;
+    }
+
+    // ── WebSocket connection ──
+    let ws = null;
+    let heartbeat = null;
+    let reconnectTimer = null;
+    let initTimeoutTimer = null;
+    let gotInitState = false;
+
+    // If WebSocket connects but INIT_STATE never arrives, fall back to REST
+    // to determine whether the user is actually tracked by Lanyard.
+    async function checkTrackingStatusViaRest() {
+      if (gotInitState) return;
+      try {
+        const res  = await fetch(`https://api.lanyard.rest/v1/users/${DISCORD_ID}`);
+        const json = await res.json();
+        if (json && json.success && json.data) {
+          render(json.data);
+          gotInitState = true;
+        } else {
+          // user_not_monitored or similar
+          presenceEl.dataset.state = 'error';
+          presenceTitle.textContent = 'Not tracked by Lanyard';
+          presenceSub.textContent   = 'join discord.gg/lanyard';
+        }
+      } catch (_) {
+        presenceEl.dataset.state = 'error';
+        presenceTitle.textContent = 'Connection failed';
+        presenceSub.textContent   = 'retrying…';
+      }
+    }
+
+    function connect() {
+      clearTimeout(reconnectTimer);
+      gotInitState = false;
+
+      try {
+        ws = new WebSocket('wss://api.lanyard.rest/socket');
+      } catch (e) {
+        scheduleReconnect();
+        return;
+      }
+
+      ws.addEventListener('open', () => { /* waiting for op:1 hello */ });
+
+      ws.addEventListener('message', ev => {
+        let msg;
+        try { msg = JSON.parse(ev.data); } catch (_) { return; }
+        const { op, t, d } = msg;
+
+        if (op === 1) {
+          // HELLO — subscribe to our user immediately (per Lanyard docs)
+          ws.send(JSON.stringify({
+            op: 2,
+            d: { subscribe_to_id: DISCORD_ID }
+          }));
+          const interval = (d && d.heartbeat_interval) ? d.heartbeat_interval : 30000;
+          clearInterval(heartbeat);
+          heartbeat = setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ op: 3 }));
+          }, interval);
+          // If INIT_STATE doesn't arrive in 6s → user likely not tracked
+          clearTimeout(initTimeoutTimer);
+          initTimeoutTimer = setTimeout(checkTrackingStatusViaRest, 6000);
+        } else if (op === 0) {
+          if (t === 'INIT_STATE' || t === 'PRESENCE_UPDATE') {
+            gotInitState = true;
+            clearTimeout(initTimeoutTimer);
+            render(d);
+          }
+        }
+      });
+
+      ws.addEventListener('close', scheduleReconnect);
+      ws.addEventListener('error', () => {
+        try { ws.close(); } catch (_) {}
+      });
+    }
+
+    function scheduleReconnect() {
+      clearInterval(heartbeat);
+      clearTimeout(initTimeoutTimer);
+      heartbeat = null;
+      presenceEl.dataset.state = 'error';
+      reconnectTimer = setTimeout(connect, 4000);
+    }
+
+    // Defer connection slightly so the reveal animation finishes first
+    setTimeout(connect, 1500);
+  }
+
+})();
+</script>
+</body>
+</html>

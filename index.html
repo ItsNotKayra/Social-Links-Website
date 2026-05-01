@@ -663,8 +663,20 @@ video.visible { opacity: 1; }
       stopFade();
       volFadeInterval=setInterval(()=>{
         if(userVol){stopFade();return;}
-        video.volume=Math.min(video.volume+0.02,1);
-        const p=Math.round(video.volume*30);
+        const MAX_VOL = 0.3;        // %30
+        const DURATION = 3000;      // 3 saniye
+        const INTERVAL = 50;        // ms
+
+        const STEPS = DURATION / INTERVAL;
+        const INCREMENT = MAX_VOL / STEPS;
+
+        video.volume = Math.min(video.volume + INCREMENT, MAX_VOL);
+
+        const p = Math.round(video.volume * 100); // slider 0-100 ise
+        updateSliderTrack(p);
+        volSlider.value = p;
+
+        if(video.volume >= MAX_VOL) stopFade();
         updateSliderTrack(p);volSlider.value=p;
         if(video.volume>=1)stopFade();
       },80);

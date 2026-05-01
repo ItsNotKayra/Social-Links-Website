@@ -310,7 +310,7 @@ video.visible { opacity: 1; }
     <path id="vol-wave1" d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.85"/>
     <path id="vol-wave2" d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/>
   </svg>
-  <input type="range" id="volume-slider" min="0" max="100" value="100">
+  <input type="range" id="volume-slider" min="0" max="100" value="30">
 </div>
 
 <!-- PROFILE CARD -->
@@ -664,7 +664,7 @@ video.visible { opacity: 1; }
       volFadeInterval=setInterval(()=>{
         if(userVol){stopFade();return;}
         video.volume=Math.min(video.volume+0.02,1);
-        const p=Math.round(video.volume*100);
+        const p=Math.round(video.volume*30);
         updateSliderTrack(p);volSlider.value=p;
         if(video.volume>=1)stopFade();
       },80);

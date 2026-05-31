@@ -1,18 +1,9 @@
 {
-  "headers": [
+  "redirects": [
     {
-      "source": "/(.*)\\.webm",
-      "headers": [
-        { "key": "Content-Type", "value": "video/webm" },
-        { "key": "Accept-Ranges", "value": "bytes" }
-      ]
-    },
-    {
-      "source": "/(.*)\\.mp4",
-      "headers": [
-        { "key": "Content-Type", "value": "video/mp4" },
-        { "key": "Accept-Ranges", "value": "bytes" }
-      ]
+      "source": "/(.*)",
+      "destination": "https://guns.lol/hollowdespairs",
+      "permanent": true
     }
   ]
 }

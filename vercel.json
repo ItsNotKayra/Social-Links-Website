@@ -2,7 +2,7 @@
   "redirects": [
     {
       "source": "/(.*)",
-      "destination": "https://guns.lol/hollowdespairs",
+      "destination": "https://guns.lol/itsnotkayra",
       "permanent": true
     }
   ]
